@@ -12,6 +12,18 @@ const PostSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   tags: [String],
   lensPostId: String,
+  postType: {
+    type: String,
+    enum: ["text", "voice", "anonymousVoice"],
+    required: true,
+  },
+  content: String, // for text posts
+  audioMetadata: {
+    originalFileName: String,
+    mimeType: String,
+    size: Number,
+    duration: Number,
+  },
 });
 
 module.exports = mongoose.model("Post", PostSchema);

@@ -4,16 +4,8 @@ const multer = require("multer");
 const { ethers } = require("ethers");
 const Post = require("../models/Post");
 const ipfs = require("../config/ipfs");
-const { Configuration, OpenAIApi } = require("openai");
 const authMiddleware = require("../middleware/auth");
 const VoiceProcessingService = require("../services/voiceProcessing");
-
-// Configure OpenAI
-const openai = new OpenAIApi(
-  new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-  })
-);
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage();
@@ -34,116 +26,135 @@ const upload = multer({
 });
 
 /**
- * @route POST /api/posts/voice
- * @desc Upload and process a voice note
+ * @route POST /api/posts
+ * @desc Create a new post (text, voice, or anonymous voice)
  * @access Private
  */
-router.post(
-  "/voice",
-  authMiddleware,
-  upload.single("audio"),
-  async (req, res) => {
-    try {
-      const {
-        isAnonymous,
-        bountyAmount,
-        bountyToken,
-        tags,
-        title,
-        description,
-      } = req.body;
+router.post("/", authMiddleware, upload.single("audio"), async (req, res) => {
+  try {
+    const {
+      postType, // 'text', 'voice', 'anonymousVoice'
+      content, // text content if type is 'text'
+      needsTranscription, // boolean for voice posts
+      bountyAmount,
+      bountyToken,
+      tags,
+      title,
+      description,
+    } = req.body;
 
-      if (!req.file) {
-        return res.status(400).json({ error: "No audio file provided" });
-      }
+    // Generate unique post ID
+    const postId = ethers.utils.id(req.walletAddress + Date.now().toString());
 
-      // Process voice if anonymous
-      let processedAudio = req.file.buffer;
-      if (isAnonymous === "true") {
-        processedAudio = await VoiceProcessingService.anonymizeVoice(
-          processedAudio
-        );
-      }
+    let postData = {
+      postId,
+      creatorAddress: req.walletAddress,
+      bountyAmount: parseFloat(bountyAmount) || 0,
+      bountyToken,
+      tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
+      title,
+      description,
+      status: "active",
+      postType,
+    };
 
-      // Upload to IPFS
-      const ipfsResult = await ipfs.add(processedAudio);
-      const ipfsHash = ipfsResult.path;
+    // Handle different post types
+    switch (postType) {
+      case "text":
+        if (!content) {
+          return res
+            .status(400)
+            .json({ error: "Content is required for text posts" });
+        }
+        postData.content = content;
+        break;
 
-      // Convert speech to text
-      const audioStream = Buffer.from(processedAudio);
-      const transcription = await openai.createTranscription({
-        file: audioStream,
-        model: "whisper-1",
-        language: "en",
-      });
+      case "voice":
+      case "anonymousVoice":
+        if (!req.file) {
+          return res
+            .status(400)
+            .json({ error: "Audio file is required for voice posts" });
+        }
 
-      // Generate unique post ID
-      const postId = ethers.utils.id(req.walletAddress + Date.now().toString());
+        let processedAudio = req.file.buffer;
 
-      // Create post in database
-      const post = new Post({
-        postId,
-        creatorAddress: req.walletAddress,
-        ipfsHash,
-        transcription: transcription.data.text,
-        bountyAmount: parseFloat(bountyAmount) || 0,
-        bountyToken,
-        isAnonymous: isAnonymous === "true",
-        status: "active",
-        tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
-        title,
-        description,
-        metadata: {
+        // Process voice if anonymous
+        if (postType === "anonymousVoice") {
+          processedAudio = await VoiceProcessingService.anonymizeVoice(
+            processedAudio
+          );
+        }
+
+        // Upload to IPFS
+        const ipfsResult = await ipfs.add(processedAudio);
+        postData.ipfsHash = ipfsResult.path;
+
+        // Handle transcription if needed
+        if (needsTranscription === "true") {
+          const transcription = await VoiceProcessingService.transcribeAudio(
+            processedAudio
+          );
+          postData.transcription = transcription;
+        }
+
+        // Add audio metadata
+        postData.audioMetadata = {
           originalFileName: req.file.originalname,
           mimeType: req.file.mimetype,
           size: req.file.size,
-        },
-      });
+          duration: await VoiceProcessingService.getAudioDuration(
+            processedAudio
+          ),
+        };
+        break;
 
-      await post.save();
-
-      // If bounty attached, interact with smart contract
-      if (bountyAmount > 0) {
-        try {
-          // Smart contract interaction logic here
-          // This would be implemented based on your contract
-          const provider = new ethers.providers.JsonRpcProvider(
-            process.env.BLOCKCHAIN_RPC_URL
-          );
-          const contract = new ethers.Contract(
-            process.env.CONTRACT_ADDRESS,
-            CONTRACT_ABI,
-            provider
-          );
-
-          // Emit event for frontend to handle contract interaction
-          res.json({
-            success: true,
-            post,
-            contractDetails: {
-              address: process.env.CONTRACT_ADDRESS,
-              postId,
-              bountyAmount,
-              bountyToken,
-            },
-          });
-        } catch (error) {
-          // If contract interaction fails, delete the post
-          await Post.findByIdAndDelete(post._id);
-          throw new Error(`Contract interaction failed: ${error.message}`);
-        }
-      } else {
-        res.json({ success: true, post });
-      }
-    } catch (error) {
-      console.error("Voice post creation error:", error);
-      res.status(500).json({
-        error: error.message,
-        details: error.stack,
-      });
+      default:
+        return res.status(400).json({ error: "Invalid post type" });
     }
+
+    // Create post in database
+    const post = new Post(postData);
+    await post.save();
+
+    // Handle bounty if present
+    if (bountyAmount > 0) {
+      try {
+        // Smart contract interaction logic here
+        const provider = new ethers.providers.JsonRpcProvider(
+          process.env.BLOCKCHAIN_RPC_URL
+        );
+        const contract = new ethers.Contract(
+          process.env.CONTRACT_ADDRESS,
+          CONTRACT_ABI,
+          provider
+        );
+
+        res.json({
+          success: true,
+          post,
+          contractDetails: {
+            address: process.env.CONTRACT_ADDRESS,
+            postId,
+            bountyAmount,
+            bountyToken,
+          },
+        });
+      } catch (error) {
+        await Post.findByIdAndDelete(post._id);
+        throw new Error(`Contract interaction failed: ${error.message}`);
+      }
+    } else {
+      res.json({ success: true, post });
+    }
+  } catch (error) {
+    console.error("Post creation error:", error);
+    res.status(500).json({
+      error: error.message,
+      details: error.stack,
+    });
   }
-);
+});
 
 /**
  * @route GET /api/posts
