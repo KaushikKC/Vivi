@@ -1,0 +1,62 @@
+"use client";
+
+import Image from "next/image";
+import React, { useState } from "react";
+import avatar from "../images/avatar.png";
+import { TiThumbsDown, TiThumbsUp } from "react-icons/ti";
+import { BiSolidCommentDetail } from "react-icons/bi";
+import { IoMdShare } from "react-icons/io";
+import close from "../images/close.png";
+import { FaReplyAll, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import Link from "next/link";
+
+function BountyAudioCard() {
+  return (
+    <section className="bg-gray-800 p-5 rounded-lg mt-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Image
+            src={avatar}
+            alt=""
+            className="w-10 h-10 bg-gray-700 rounded-full"
+          />
+          <div>
+            <h3 className="text-[16px] font-semibold">Madhu Varsha</h3>
+            <p className="text-sm text-gray-400">
+              Posted on Monday, 28 December 2024
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="my-3">
+        <div className="bg-gray-700 p-3 rounded-md text-center text-sm">
+          🎙️ Audio Content
+        </div>
+      </div>
+      <div className="flex space-x-4">
+        <div className="bg-gray-600 w-fit px-3 rounded-xl ">
+          <p className="text-white">
+            Amount: <span className="font-semibold">0.05 ETH</span>
+          </p>
+        </div>
+        <div className="bg-gray-600 w-fit px-3 rounded-xl ">
+          <p className="text-white">
+            Expires in: <span className="font-semibold">2 days</span>
+          </p>
+        </div>
+        <div className="bg-gray-600 w-fit px-3 rounded-xl ">
+          <p className="text-white">
+            Responses: <span className="font-semibold">20</span>
+          </p>
+        </div>
+      </div>
+      <div className="flex justify-center">
+        <button className="text-[16px] mt-3 font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200 whitespace-nowrap ">
+          Award Manually
+        </button>
+      </div>
+    </section>
+  );
+}
+
+export default BountyAudioCard;

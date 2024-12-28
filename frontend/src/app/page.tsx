@@ -1,11 +1,11 @@
 import React from "react";
 import Image from "next/image";
-import header from "./images/header.png";
-import image1 from "./images/voice-sign.png";
-import audio from "./images/audio-design.png";
-import ShufflingCards from "./components/ShufflingCards";
-import Navbar from "./components/Navbar";
-import VoiceEffect from "./components/VoiceEffect";
+import header from "../images/header.png";
+import image1 from "../images/voice-sign.png";
+import audio from "../images/audio-design.png";
+import ShufflingCards from "../components/ShufflingCards";
+import Navbar from "../components/Navbar";
+import VoiceEffect from "../components/VoiceEffect";
 
 const App: React.FC = () => {
   return (
