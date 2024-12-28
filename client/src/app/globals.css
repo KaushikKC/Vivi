@@ -1,7 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* styles/globals.css */
+/* @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap'); */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -32,3 +33,5 @@ body {
 .header {
   font-family: var(--font-zen-dots); /* Use Zen Dots for headers */
 }
+
+

@@ -5,24 +5,11 @@ import image1 from "./images/voice-sign.png";
 import audio from "./images/audio-design.png";
 import ShufflingCards from "./components/ShufflingCards";
 import Navbar from "./components/Navbar";
-import { Rajdhani, Zen_Dots } from "@next/font/google";
 import VoiceEffect from "./components/VoiceEffect";
-
-const zenDots = Zen_Dots({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-zen-dots"
-});
-
-const rajdhani = Rajdhani({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-rajdhani"
-});
 
 const App: React.FC = () => {
   return (
-    <div className={`${zenDots.variable} ${rajdhani.variable} font-sans`}>
+    <div className="font-rajdhani">
       <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen flex flex-col items-center justify-center text-white">
         <header className="absolute top-6 left-6 flex items-center space-x-2">
           <Image

@@ -13,9 +13,10 @@ export default {
         foreground: "var(--foreground)",
       },
       fontFamily: {
-        sans: ["var(--font-rajdhani)"],
+        rajdhani: ["var(--font-rajdhani)"],
         zenDots: ["var(--font-zen-dots)"],
       },
+       
     },
   },
   plugins: [],
