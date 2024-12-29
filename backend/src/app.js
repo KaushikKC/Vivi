@@ -22,6 +22,7 @@ app.use(limiter);
 // Routes
 app.use("/api/posts", require("./routes/posts"));
 app.use("/api/bounties", require("./routes/bounties"));
+app.use("/api/users", require("./routes/users"));
 
 // Error handling
 app.use((err, req, res, next) => {
