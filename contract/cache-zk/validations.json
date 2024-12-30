@@ -1,0 +1,483 @@
+{
+  "version": "3.4",
+  "log": [
+    {
+      "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20": {
+        "src": "@openzeppelin/contracts/token/ERC20/ERC20.sol:38",
+        "version": {
+          "withMetadata": "3576ead8cbc0a8f98f2ba9a5ef1645101675b3923b480054709ac3eb2c2b0641",
+          "withoutMetadata": "3576ead8cbc0a8f98f2ba9a5ef1645101675b3923b480054709ac3eb2c2b0641",
+          "linkedWithoutMetadata": "3576ead8cbc0a8f98f2ba9a5ef1645101675b3923b480054709ac3eb2c2b0641"
+        },
+        "inherit": [
+          "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:IERC20Metadata",
+          "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string)",
+          "name()",
+          "symbol()",
+          "decimals()",
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "increaseAllowance(address,uint256)",
+          "decreaseAllowance(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20",
+            "src": "@openzeppelin/contracts/token/ERC20/ERC20.sol:54"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20",
+              "label": "_balances",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin/contracts/token/ERC20/ERC20.sol:39"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_allowances",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+              "src": "@openzeppelin/contracts/token/ERC20/ERC20.sol:41"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_totalSupply",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts/token/ERC20/ERC20.sol:43"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "@openzeppelin/contracts/token/ERC20/ERC20.sol:45"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "@openzeppelin/contracts/token/ERC20/ERC20.sol:46"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+              "label": "mapping(address => mapping(address => uint256))"
+            },
+            "t_string_storage": {
+              "label": "string"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      },
+      "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20": {
+        "src": "@openzeppelin/contracts/token/ERC20/IERC20.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      },
+      "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:IERC20Metadata": {
+        "src": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:13",
+        "inherit": [
+          "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "decimals()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      },
+      "@openzeppelin/contracts/utils/Context.sol:Context": {
+        "src": "@openzeppelin/contracts/utils/Context.sol:16",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      },
+      "contracts/MockERC20.sol:MockERC20": {
+        "src": "contracts/MockERC20.sol:7",
+        "version": {
+          "withMetadata": "bab8642542eba15730d2e9228801043e71b868843bbc314d7f223486ef118bf6",
+          "withoutMetadata": "bab8642542eba15730d2e9228801043e71b868843bbc314d7f223486ef118bf6",
+          "linkedWithoutMetadata": "bab8642542eba15730d2e9228801043e71b868843bbc314d7f223486ef118bf6"
+        },
+        "inherit": [
+          "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
+          "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol:IERC20Metadata",
+          "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string)",
+          "mint(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "MockERC20",
+            "src": "contracts/MockERC20.sol:8"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      }
+    },
+    {
+      "@openzeppelin/contracts/access/Ownable.sol:Ownable": {
+        "src": "@openzeppelin/contracts/access/Ownable.sol:20",
+        "inherit": [
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin/contracts/access/Ownable.sol:28"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin/contracts/access/Ownable.sol:21"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      },
+      "@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20": {
+        "src": "@openzeppelin/contracts/token/ERC20/IERC20.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      },
+      "@openzeppelin/contracts/utils/Context.sol:Context": {
+        "src": "@openzeppelin/contracts/utils/Context.sol:16",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      },
+      "contracts/Vivi.sol:Vivi": {
+        "src": "contracts/Vivi.sol:7",
+        "version": {
+          "withMetadata": "ac6d61794e70934a42b9518576781d8b40b64b738497a5f42096d2bec79bfe6c",
+          "withoutMetadata": "ac6d61794e70934a42b9518576781d8b40b64b738497a5f42096d2bec79bfe6c",
+          "linkedWithoutMetadata": "ac6d61794e70934a42b9518576781d8b40b64b738497a5f42096d2bec79bfe6c"
+        },
+        "inherit": [
+          "@openzeppelin/contracts/access/Ownable.sol:Ownable",
+          "@openzeppelin/contracts/utils/Context.sol:Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "createPost(string,uint8,uint256,address)",
+          "addComment(uint256,string,uint8,bool)",
+          "likePost(uint256)",
+          "likeComment(uint256)",
+          "editComment(uint256,string)",
+          "deleteComment(uint256)",
+          "addBountyToPost(uint256,uint256,address)",
+          "awardBounty(uint256,address)",
+          "cancelPost(uint256)",
+          "recoverToken(address,uint256)",
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Vivi",
+            "src": "contracts/Vivi.sol:8"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Vivi",
+              "label": "posts",
+              "type": "t_mapping(t_uint256,t_struct(Post)251_storage)",
+              "src": "contracts/Vivi.sol:40"
+            },
+            {
+              "contract": "Vivi",
+              "label": "comments",
+              "type": "t_mapping(t_uint256,t_struct(Comment)267_storage)",
+              "src": "contracts/Vivi.sol:41"
+            },
+            {
+              "contract": "Vivi",
+              "label": "postComments",
+              "type": "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)",
+              "src": "contracts/Vivi.sol:42"
+            },
+            {
+              "contract": "Vivi",
+              "label": "postLikes",
+              "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+              "src": "contracts/Vivi.sol:43"
+            },
+            {
+              "contract": "Vivi",
+              "label": "commentLikes",
+              "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+              "src": "contracts/Vivi.sol:44"
+            },
+            {
+              "contract": "Vivi",
+              "label": "hasLikedPost",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_bool))",
+              "src": "contracts/Vivi.sol:45"
+            },
+            {
+              "contract": "Vivi",
+              "label": "hasLikedComment",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_bool))",
+              "src": "contracts/Vivi.sol:46"
+            },
+            {
+              "contract": "Vivi",
+              "label": "postCount",
+              "type": "t_uint256",
+              "src": "contracts/Vivi.sol:48"
+            },
+            {
+              "contract": "Vivi",
+              "label": "commentCount",
+              "type": "t_uint256",
+              "src": "contracts/Vivi.sol:49"
+            }
+          ],
+          "types": {
+            "t_mapping(t_uint256,t_struct(Post)251_storage)": {
+              "label": "mapping(uint256 => struct Vivi.Post)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_struct(Post)251_storage": {
+              "label": "struct Vivi.Post",
+              "members": [
+                {
+                  "label": "id",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "creator",
+                  "type": "t_address"
+                },
+                {
+                  "label": "contentHash",
+                  "type": "t_string_storage"
+                },
+                {
+                  "label": "postType",
+                  "type": "t_enum(PostType)235"
+                },
+                {
+                  "label": "bountyAmount",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "bountyToken",
+                  "type": "t_address"
+                },
+                {
+                  "label": "isActive",
+                  "type": "t_bool"
+                }
+              ]
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_enum(PostType)235": {
+              "label": "enum Vivi.PostType",
+              "members": [
+                "TEXT",
+                "VOICE"
+              ]
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_uint256,t_struct(Comment)267_storage)": {
+              "label": "mapping(uint256 => struct Vivi.Comment)"
+            },
+            "t_struct(Comment)267_storage": {
+              "label": "struct Vivi.Comment",
+              "members": [
+                {
+                  "label": "id",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "postId",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "commenter",
+                  "type": "t_address"
+                },
+                {
+                  "label": "contentHash",
+                  "type": "t_string_storage"
+                },
+                {
+                  "label": "commentType",
+                  "type": "t_enum(PostType)235"
+                },
+                {
+                  "label": "isAnonymous",
+                  "type": "t_bool"
+                },
+                {
+                  "label": "isActive",
+                  "type": "t_bool"
+                }
+              ]
+            },
+            "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)": {
+              "label": "mapping(uint256 => uint256[])"
+            },
+            "t_array(t_uint256)dyn_storage": {
+              "label": "uint256[]"
+            },
+            "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+              "label": "mapping(uint256 => address[])"
+            },
+            "t_array(t_address)dyn_storage": {
+              "label": "address[]"
+            },
+            "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
+              "label": "mapping(address => mapping(uint256 => bool))"
+            },
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            }
+          },
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.20"
+      }
+    }
+  ]
+}

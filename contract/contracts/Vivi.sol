@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Vivi is Ownable {
-    constructor() Ownable(msg.sender) {
+    constructor() Ownable() {
         // Initialize with msg.sender as the initial owner
     }
 
@@ -26,9 +26,27 @@ contract Vivi is Ownable {
         bool isActive;
     }
 
+    struct Comment {
+        uint256 id;
+        uint256 postId;
+        address commenter;
+        string contentHash;
+        PostType commentType;
+        bool isAnonymous;
+        bool isActive;
+    }
+
     // Mapping for posts
     mapping(uint256 => Post) public posts;
+    mapping(uint256 => Comment) public comments;
+    mapping(uint256 => uint256[]) public postComments;
+    mapping(uint256 => address[]) public postLikes;
+    mapping(uint256 => address[]) public commentLikes;
+    mapping(address => mapping(uint256 => bool)) public hasLikedPost;
+    mapping(address => mapping(uint256 => bool)) public hasLikedComment;
+
     uint256 public postCount;
+    uint256 public commentCount;
 
     // Events
     event PostCreated(
@@ -52,6 +70,20 @@ contract Vivi is Ownable {
     event PostCancelled(uint256 indexed postId, address indexed creator);
 
     event EmergencyTokenRecovered(address indexed token, uint256 amount);
+
+    event CommentAdded(
+        uint256 indexed postId,
+        uint256 indexed commentId,
+        address indexed commenter,
+        bool isAnonymous,
+        string contentHash,
+        PostType commentType
+    );
+
+    event PostLiked(uint256 indexed postId, address indexed liker);
+    event CommentLiked(uint256 indexed commentId, address indexed liker);
+    event CommentEdited(uint256 indexed commentId, string newContentHash);
+    event CommentDeleted(uint256 indexed commentId);
 
     // Create a new post
     function createPost(
@@ -90,6 +122,92 @@ contract Vivi is Ownable {
             bountyAmount,
             bountyToken
         );
+    }
+
+    function addComment(
+        uint256 postId,
+        string memory contentHash,
+        PostType commentType,
+        bool isAnonymous
+    ) external {
+        require(posts[postId].isActive, "Post is not active");
+        require(bytes(contentHash).length > 0, "Content hash cannot be empty");
+
+        commentCount++;
+        comments[commentCount] = Comment({
+            id: commentCount,
+            postId: postId,
+            commenter: isAnonymous ? address(0) : msg.sender,
+            contentHash: contentHash,
+            commentType: commentType,
+            isAnonymous: isAnonymous,
+            isActive: true
+        });
+
+        postComments[postId].push(commentCount);
+
+        emit CommentAdded(
+            postId,
+            commentCount,
+            msg.sender,
+            isAnonymous,
+            contentHash,
+            commentType
+        );
+    }
+
+    function likePost(uint256 postId) external {
+        require(posts[postId].isActive, "Post is not active");
+        require(
+            !hasLikedPost[msg.sender][postId],
+            "You already liked this post"
+        );
+
+        postLikes[postId].push(msg.sender);
+        hasLikedPost[msg.sender][postId] = true;
+
+        emit PostLiked(postId, msg.sender);
+    }
+
+    function likeComment(uint256 commentId) external {
+        require(comments[commentId].isActive, "Comment is not active");
+        require(
+            !hasLikedComment[msg.sender][commentId],
+            "You already liked this comment"
+        );
+
+        commentLikes[commentId].push(msg.sender);
+        hasLikedComment[msg.sender][commentId] = true;
+
+        emit CommentLiked(commentId, msg.sender);
+    }
+
+    function editComment(
+        uint256 commentId,
+        string memory newContentHash
+    ) external {
+        Comment storage comment = comments[commentId];
+        require(comment.isActive, "Comment is not active");
+        require(msg.sender == comment.commenter, "Only the commenter can edit");
+        require(
+            bytes(newContentHash).length > 0,
+            "Content hash cannot be empty"
+        );
+
+        comment.contentHash = newContentHash;
+        emit CommentEdited(commentId, newContentHash);
+    }
+
+    function deleteComment(uint256 commentId) external {
+        Comment storage comment = comments[commentId];
+        require(comment.isActive, "Comment is not active");
+        require(
+            msg.sender == comment.commenter,
+            "Only the commenter can delete"
+        );
+
+        comment.isActive = false;
+        emit CommentDeleted(commentId);
     }
 
     // Add bounty to an existing post
