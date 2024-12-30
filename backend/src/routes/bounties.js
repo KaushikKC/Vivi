@@ -1,4 +1,9 @@
+const express = require("express");
+const router = express.Router(); // Add this line
 const bountyRouter = express.Router();
+const authMiddleware = require("../middleware/auth");
+const Post = require("../models/Post"); // Add Post model import
+const ethers = require("ethers");
 
 /**
  * @route POST /api/bounties/:postId/award
@@ -76,7 +81,4 @@ bountyRouter.get("/active", async (req, res) => {
   }
 });
 
-module.exports = {
-  postRoutes: router,
-  bountyRoutes: bountyRouter,
-};
+module.exports = bountyRouter;

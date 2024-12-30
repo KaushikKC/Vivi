@@ -27,131 +27,143 @@ const upload = multer({
 
 /**
  * @route POST /api/posts
- * @desc Create a new post (text, voice, or anonymous voice)
+ * @desc Upload content to IPFS and return hash
  * @access Private
  */
-router.post("/", authMiddleware, upload.single("audio"), async (req, res) => {
+router.post("/", authMiddleware, upload.single("voice"), async (req, res) => {
   try {
-    const {
-      postType, // 'text', 'voice', 'anonymousVoice'
-      content, // text content if type is 'text'
-      needsTranscription, // boolean for voice posts
-      bountyAmount,
-      bountyToken,
-      tags,
-      title,
-      description,
-    } = req.body;
+    const { type, author, content: textContent } = req.body;
+    let content = {};
 
-    // Generate unique post ID
-    const postId = ethers.utils.id(req.walletAddress + Date.now().toString());
-
-    let postData = {
-      postId,
-      creatorAddress: req.walletAddress,
-      bountyAmount: parseFloat(bountyAmount) || 0,
-      bountyToken,
-      tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
-      title,
-      description,
-      status: "active",
-      postType,
+    // Handle TEXT posts
+    if (type === "TEXT") {
+      if (!textContent) {
+        return res.status(400).json({
+          status: "error",
+          message: "Content is required for text posts",
+        });
+      }
+      content.text = textContent;
+    } else if (type === "VOICE") {
+      if (!req.file) {
+        return res.status(400).json({
+          status: "error",
+          message: "Voice file is required for voice posts",
+        });
+      }
+      content.voice = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+        fileName: req.file.originalname,
+        fileSize: req.file.size,
+      };
+    }
+    // Create metadata object
+    const metadata = {
+      type: type || "TEXT",
+      author: author || req.walletAddress,
+      timestamp: Date.now(),
+      ...(type === "VOICE" && {
+        fileName: content.voice?.fileName,
+        fileSize: content.voice?.fileSize,
+        contentType: content.voice?.contentType,
+      }),
     };
 
-    // Handle different post types
-    switch (postType) {
-      case "text":
-        if (!content) {
-          return res
-            .status(400)
-            .json({ error: "Content is required for text posts" });
-        }
-        postData.content = content;
-        break;
+    // Upload to IPFS
+    const ipfsContent = {
+      ...(type === "TEXT" && { content: content.text }),
+      metadata,
+    };
+    const result = await ipfs.add(JSON.stringify(ipfsContent));
 
-      case "voice":
-      case "anonymousVoice":
-        if (!req.file) {
-          return res
-            .status(400)
-            .json({ error: "Audio file is required for voice posts" });
-        }
+    // Create post
+    const post = new Post({
+      content,
+      contentHash: result.path,
+      postType: type || "TEXT",
+      creatorAddress: author || req.walletAddress,
+      status: "ACTIVE",
+      bountyAmount: "0",
+      bountyToken: ethers.constants.AddressZero,
+      metadata,
+    });
 
-        let processedAudio = req.file.buffer;
-
-        // Process voice if anonymous
-        if (postType === "anonymousVoice") {
-          processedAudio = await VoiceProcessingService.anonymizeVoice(
-            processedAudio
-          );
-        }
-
-        // Upload to IPFS
-        const ipfsResult = await ipfs.add(processedAudio);
-        postData.ipfsHash = ipfsResult.path;
-
-        // Handle transcription if needed
-        if (needsTranscription === "true") {
-          const transcription = await VoiceProcessingService.transcribeAudio(
-            processedAudio
-          );
-          postData.transcription = transcription;
-        }
-
-        // Add audio metadata
-        postData.audioMetadata = {
-          originalFileName: req.file.originalname,
-          mimeType: req.file.mimetype,
-          size: req.file.size,
-          duration: await VoiceProcessingService.getAudioDuration(
-            processedAudio
-          ),
-        };
-        break;
-
-      default:
-        return res.status(400).json({ error: "Invalid post type" });
-    }
-
-    // Create post in database
-    const post = new Post(postData);
     await post.save();
 
-    // Handle bounty if present
-    if (bountyAmount > 0) {
-      try {
-        // Smart contract interaction logic here
-        const provider = new ethers.providers.JsonRpcProvider(
-          process.env.BLOCKCHAIN_RPC_URL
-        );
-        const contract = new ethers.Contract(
-          process.env.CONTRACT_ADDRESS,
-          CONTRACT_ABI,
-          provider
-        );
-
-        res.json({
-          success: true,
-          post,
-          contractDetails: {
-            address: process.env.CONTRACT_ADDRESS,
-            postId,
-            bountyAmount,
-            bountyToken,
-          },
-        });
-      } catch (error) {
-        await Post.findByIdAndDelete(post._id);
-        throw new Error(`Contract interaction failed: ${error.message}`);
-      }
-    } else {
-      res.json({ success: true, post });
-    }
+    res.json({
+      contentHash: result.path,
+      postId: post._id,
+      status: "success",
+    });
   } catch (error) {
-    console.error("Post creation error:", error);
+    console.error("IPFS upload error:", error);
     res.status(500).json({
-      error: error.message,
-      details: error.stack,
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * @route POST /api/posts/:postId/bounty
+ * @desc Add bounty to post
+ * @access Private
+ */
+router.post("/:postId/bounty", authMiddleware, async (req, res) => {
+  try {
+    const { bountyAmount, bountyToken } = req.body;
+
+    // Validate input
+    if (!bountyAmount || !ethers.utils.isAddress(bountyToken)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid bounty amount or token address",
+      });
+    }
+
+    // Find post in database
+    const post = await Post.findById(req.params.postId);
+    if (!post) {
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found",
+      });
+    }
+
+    // Create bounty metadata
+    const bountyMetadata = {
+      postId: req.params.postId,
+      bountyAmount: ethers.utils
+        .parseUnits(bountyAmount.toString(), "ether")
+        .toString(),
+      bountyToken,
+      creator: req.walletAddress,
+      timestamp: Date.now(),
+      status: "ACTIVE",
+    };
+
+    // Upload bounty metadata to IPFS
+    const result = await ipfs.add(JSON.stringify(bountyMetadata));
+
+    // Update post with bounty information
+    post.bountyAmount = bountyMetadata.bountyAmount;
+    post.bountyToken = bountyToken;
+    post.bountyMetadata = bountyMetadata;
+    post.bountyContentHash = result.path;
+
+    await post.save();
+
+    res.json({
+      contentHash: result.path,
+      status: "success",
+      bountyMetadata,
+    });
+  } catch (error) {
+    console.error("Bounty addition error:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
     });
   }
 });
@@ -292,3 +304,5 @@ router.delete("/:postId", authMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+module.exports = router;

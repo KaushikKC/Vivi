@@ -1,29 +1,85 @@
 const mongoose = require("mongoose");
+const { ethers } = require("ethers");
 
-const PostSchema = new mongoose.Schema({
-  postId: String,
-  creatorAddress: String,
-  ipfsHash: String,
-  transcription: String,
-  bountyAmount: Number,
-  bountyToken: String,
-  isAnonymous: Boolean,
-  status: String,
-  createdAt: { type: Date, default: Date.now },
-  tags: [String],
-  lensPostId: String,
-  postType: {
-    type: String,
-    enum: ["text", "voice", "anonymousVoice"],
-    required: true,
+const postSchema = new mongoose.Schema(
+  {
+    contentHash: {
+      type: String,
+      required: true,
+    },
+    postType: {
+      type: String,
+      enum: ["TEXT", "VOICE"],
+      required: true,
+    },
+    content: {
+      text: {
+        type: String,
+      },
+      voice: {
+        data: Buffer, // For storing binary voice data
+        contentType: String, // For MIME type
+        fileName: String,
+        fileSize: Number,
+      },
+    },
+    creatorAddress: {
+      type: String,
+      required: true,
+      lowercase: true,
+    },
+    status: {
+      type: String,
+      enum: ["ACTIVE", "COMPLETED", "CANCELLED"],
+      default: "ACTIVE",
+    },
+    bountyAmount: {
+      type: String,
+      default: "0",
+    },
+    bountyToken: {
+      type: String,
+      default: ethers.ZeroAddress,
+    },
+    bountyContentHash: String,
+    metadata: {
+      type: Object,
+      required: true,
+    },
+    bountyMetadata: {
+      type: Object,
+    },
+    likes: [
+      {
+        type: String, // wallet addresses
+        lowercase: true,
+      },
+    ],
+    dislikes: [
+      {
+        type: String, // wallet addresses
+        lowercase: true,
+      },
+    ],
+    commentCount: {
+      type: Number,
+      default: 0,
+    },
   },
-  content: String, // for text posts
-  audioMetadata: {
-    originalFileName: String,
-    mimeType: String,
-    size: Number,
-    duration: Number,
-  },
+  {
+    timestamps: true,
+  }
+);
+
+// Validate that either text or voice content is present based on postType
+postSchema.pre("save", function (next) {
+  if (this.postType === "TEXT" && !this.content.text) {
+    next(new Error("Text content is required for TEXT posts"));
+  } else if (this.postType === "VOICE" && !this.content.voice.data) {
+    next(new Error("Voice content is required for VOICE posts"));
+  } else {
+    next();
+  }
 });
 
-module.exports = mongoose.model("Post", PostSchema);
+module.exports = mongoose.model("Post", postSchema);

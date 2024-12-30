@@ -6,3 +6,5 @@ const authMiddleware = (req, res, next) => {
   req.walletAddress = walletAddress;
   next();
 };
+
+module.exports = authMiddleware;

@@ -14,3 +14,5 @@ const ipfs = create({
     authorization: auth,
   },
 });
+
+module.exports = ipfs;
