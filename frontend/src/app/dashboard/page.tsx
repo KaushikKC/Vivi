@@ -12,15 +12,15 @@ import TextCard from "../../components/TextCard";
 import logo from "../../images/vivi1.png";
 import Link from "next/link";
 import AudioPlayer from "../../components/AudioPlayer";
-
+import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
 const Dashboard: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [postType, setPostType] = useState<'text' | 'audio'>('text');
+  const [postType, setPostType] = useState<"text" | "audio">("text");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,15 +68,15 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handlePostTypeSelect = (type: 'text' | 'audio') => {
+  const handlePostTypeSelect = (type: "text" | "audio") => {
     setPostType(type);
     setShowDropdown(false);
   };
 
-
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
       {/* Header */}
+<<<<<<< HEAD
     <div className="absolute flex justify-between w-full top-6">
     <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
      <Link href="/">
@@ -88,8 +88,23 @@ const Dashboard: React.FC = () => {
       <Image src={avatar} alt="avatar" className="h-12 w-12" /></Link>          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
             0x1D3z.....k2d4
           </p>
+=======
+      <div className="absolute flex justify-between w-full top-6">
+        <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
+          <Link href="/">
+            <Image
+              src={logo}
+              alt="logo"
+              className="ml-10 h-16 w-16 rounded-full"
+            />
+          </Link>
+>>>>>>> origin/main
         </div>
-    </div>
+        <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
+          <Image src={avatar} alt="avatar" className="h-12 w-12" />
+          <ConnectWalletButton />
+        </div>
+      </div>
       <div className="flex justify-center items-center">
         <Navbar />
       </div>
@@ -118,67 +133,80 @@ const Dashboard: React.FC = () => {
             </button>
           </div>
           <div className="flex flex-col space-y-4">
+<<<<<<< HEAD
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
             
+=======
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {/* Attach Bounty */}
+                <div className="relative p-3 border-2 rounded-xl w-auto border-[#7482F1]">
+                  <div className="absolute -top-4 left-3 bg-gray-800 px-2 text-white font-semibold text-[18px]">
+                    Attach Bounty
+                  </div>
+                  <input
+                    type="text"
+                    className="bg-transparent text-white w-full focus:outline-none"
+                    placeholder="Enter bounty in ETH"
+                    defaultValue="0.005 ETH"
+                  />
+                </div>
+>>>>>>> origin/main
 
-              
-        {/* Post Dropdown */}
-<div className="relative">
-  <button
-    onClick={() => setShowDropdown(!showDropdown)}
-    className="text-[16px] bg-gray-800 p-3 rounded-xl flex items-center gap-2 transition-colors border border-[#7482F1]"
-  >
-    {postType === "audio" ? (
-      <>
-        <FaMicrophone className="text-purple-400" />
-        <span>Post as Audio</span>
-      </>
-    ) : (
-      <>
-        <LuMessageSquareText className="text-green-400" />
-        <span>Post as Text</span>
-      </>
-    )}
-    <IoMdArrowDropdown className="text-white" />
-  </button>
-  {showDropdown && (
-    <div className="absolute top-full mt-2 bg-gray-800 rounded shadow-lg w-40 z-10">
-      <div
-        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
-        onClick={() => handlePostTypeSelect("audio")}
-      >
-        <FaMicrophone className="text-purple-400" />
-        <span>Post as Audio</span>
-      </div>
-      <div
-        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
-        onClick={() => handlePostTypeSelect("text")}
-      >
-        <LuMessageSquareText className="text-green-400" />
-        <span>Post as Text</span>
-      </div>
-    </div>
-  )}
-</div>
+                {/* Post Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="text-[16px] bg-gray-800 p-3 rounded-xl flex items-center gap-2 transition-colors border border-[#7482F1]"
+                  >
+                    {postType === "audio" ? (
+                      <>
+                        <FaMicrophone className="text-purple-400" />
+                        <span>Post as Audio</span>
+                      </>
+                    ) : (
+                      <>
+                        <LuMessageSquareText className="text-green-400" />
+                        <span>Post as Text</span>
+                      </>
+                    )}
+                    <IoMdArrowDropdown className="text-white" />
+                  </button>
+                  {showDropdown && (
+                    <div className="absolute top-full mt-2 bg-gray-800 rounded shadow-lg w-40 z-10">
+                      <div
+                        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
+                        onClick={() => handlePostTypeSelect("audio")}
+                      >
+                        <FaMicrophone className="text-purple-400" />
+                        <span>Post as Audio</span>
+                      </div>
+                      <div
+                        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
+                        onClick={() => handlePostTypeSelect("text")}
+                      >
+                        <LuMessageSquareText className="text-green-400" />
+                        <span>Post as Text</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
+                {/* Microphone Button */}
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer ${
+                      isRecording ? "opacity-70" : "hover:opacity-90"
+                    }`}
+                    onClick={handleRecordClick}
+                  >
+                    <FaMicrophone className="h-9 w-9 text-white p-2" />
+                  </div>
+                </div>
 
-            {/* Microphone Button */}
-<div className="flex flex-col items-center">
-  <div
-    className={`bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer ${
-      isRecording ? "opacity-70" : "hover:opacity-90"
-    }`}
-    onClick={handleRecordClick}
-  >
-    <FaMicrophone className="h-9 w-9 text-white p-2" />
-  </div>
-
-</div>
-
-            
-              {/* Attach Image */}
-              <div
+                {/* Attach Image */}
+                <div
                   className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer"
                   onClick={handleImageClick}
                 >
@@ -193,38 +221,37 @@ const Dashboard: React.FC = () => {
                 </div>
                 {selectedImage && (
                   <span className="text-sm text-gray-300 ml-[-10px]">
-                     {selectedImage}
+                    {selectedImage}
                   </span>
                 )}
-            </div>
+              </div>
 
-            {/* Anonymous Toggle */}
-            <div className="flex items-center gap-2">
-              <label
-                className={`relative inline-block w-12 h-6 cursor-pointer ${
-                  isAnonymous ? "bg-blue-600" : "bg-gray-700"
-                } rounded-full transition-colors`}
-              >
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={isAnonymous}
-                  onChange={() => setIsAnonymous(!isAnonymous)}
-                />
-                <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform transform peer-checked:translate-x-6" />
-              </label>
-              <span className="text-sm text-white">
-                {isAnonymous ? "Go Incognito" : "Go Public"}
-              </span>
+              {/* Anonymous Toggle */}
+              <div className="flex items-center gap-2">
+                <label
+                  className={`relative inline-block w-12 h-6 cursor-pointer ${
+                    isAnonymous ? "bg-blue-600" : "bg-gray-700"
+                  } rounded-full transition-colors`}
+                >
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={isAnonymous}
+                    onChange={() => setIsAnonymous(!isAnonymous)}
+                  />
+                  <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform transform peer-checked:translate-x-6" />
+                </label>
+                <span className="text-sm text-white">
+                  {isAnonymous ? "Go Incognito" : "Go Public"}
+                </span>
+              </div>
             </div>
-          
-          </div>
-          {isRecording && (
-    <span className="text-red-500 flex items-center gap-2 mt-2">
-      <span className="animate-pulse h-2 w-2 rounded-full bg-red-500"></span>
-      Recording...
-    </span>
-  )}
+            {isRecording && (
+              <span className="text-red-500 flex items-center gap-2 mt-2">
+                <span className="animate-pulse h-2 w-2 rounded-full bg-red-500"></span>
+                Recording...
+              </span>
+            )}
             {audioUrl && (
               <div className="w-full bg-gray-700/50 rounded-lg p-2">
                 <AudioPlayer audioUrl={audioUrl} />
@@ -234,7 +261,7 @@ const Dashboard: React.FC = () => {
         </section>
 
         {/* Posts */}
-        <AudioCard />
+        <AudioCard audioUrl={audioUrl} />
         <TextCard />
       </main>
     </div>

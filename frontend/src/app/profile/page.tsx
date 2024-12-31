@@ -8,8 +8,10 @@ import logo from "../../images/vivi1.png";
 import Link from "next/link";
 import ViewAudioCard from "@/components/ViewAudioCard";
 import ViewTextCard from "@/components/ViewTextCard";
+import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
 const Profile: React.FC = () => {
+<<<<<<< HEAD
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("Madhu Varsha");
   const [bio, setBio] = useState("Write a description about yourself");
@@ -32,6 +34,10 @@ const Profile: React.FC = () => {
     }
   };
 
+=======
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [audioUrl, setAudioUrl] = useState<string>("");
+>>>>>>> origin/main
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
       <div className="absolute flex justify-between w-full top-6">
@@ -44,6 +50,7 @@ const Profile: React.FC = () => {
             />
           </Link>
         </div>
+<<<<<<< HEAD
         <div className="right-0 flex items-center justify-end space-x-3 mr-5">
           <Link href="/profile">
             <Image src={avatarUrl} alt="avatar" className="h-12 w-12" />
@@ -51,6 +58,11 @@ const Profile: React.FC = () => {
           <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
             0x1D3z.....k2d4
           </p>
+=======
+        <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
+          <Image src={avatar} alt="avatar" className="h-12 w-12" />
+          <ConnectWalletButton />
+>>>>>>> origin/main
         </div>
       </div>
       <div className="flex justify-center items-center">
@@ -129,8 +141,8 @@ const Profile: React.FC = () => {
           <p className="cursor-pointer hover:underline">See all</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ViewAudioCard />
-          <ViewAudioCard />
+          <ViewAudioCard audioUrl={audioUrl} />
+          <ViewAudioCard audioUrl={audioUrl} />
           <ViewTextCard />
           <ViewTextCard />
         </div>

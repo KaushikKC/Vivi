@@ -1,17 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 import avatar from "../images/avatar.png";
-import { TiThumbsDown, TiThumbsUp } from "react-icons/ti";
-import { BiSolidCommentDetail } from "react-icons/bi";
-import { IoMdShare } from "react-icons/io";
-import close from "../images/close.png";
-import { FaReplyAll, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import Link from "next/link";
 import AudioPlayer from "./AudioPlayer";
 
+<<<<<<< HEAD:frontend/src/components/ClosedBountyAudioCard.tsx
 function ClosedBountyAudioCard() {
+=======
+interface BountyAudioCardProps {
+  audioUrl: string;
+}
+
+function BountyAudioCard({ audioUrl }: BountyAudioCardProps) {
+>>>>>>> origin/main:frontend/src/components/BountyAudioCard.tsx
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4">
       <div className="flex items-center justify-between">
@@ -31,7 +33,7 @@ function ClosedBountyAudioCard() {
       </div>
       <div className="my-3 flex justify-center w-fit">
         <div className="w-fit bg-gray-700/50 rounded-lg p-2">
-          <AudioPlayer />
+          <AudioPlayer audioUrl={audioUrl} />
         </div>
       </div>
       <div className="flex space-x-4">

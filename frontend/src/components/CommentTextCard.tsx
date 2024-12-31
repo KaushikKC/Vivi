@@ -3,12 +3,7 @@
 import React, { useState } from "react";
 import avatar from "../images/avatar.png";
 import Image from "next/image";
-import { IoMdShare } from "react-icons/io";
-import { BiSolidCommentDetail } from "react-icons/bi";
 import { FaReplyAll, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import example from "../images/example.png";
-import close from "../images/close.png";
-import Link from "next/link";
 
 const CommentTextCard: React.FC = () => {
   const [likes, setLikes] = useState<number>(0);
@@ -71,23 +66,19 @@ const CommentTextCard: React.FC = () => {
         <div className="flex items-center gap-4">
           <button onClick={handleLike} className="flex items-center gap-1">
             <FaThumbsUp
-              className={`h-5 w-5 ${isLiked
-                ? "text-blue-500"
-                : "text-gray-400"}`}
+              className={`h-5 w-5 ${
+                isLiked ? "text-blue-500" : "text-gray-400"
+              }`}
             />
-            <span className="text-white">
-              {likes}
-            </span>
+            <span className="text-white">{likes}</span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
-              className={`h-5 w-5 ${isDisliked
-                ? "text-red-500"
-                : "text-gray-400"}`}
+              className={`h-5 w-5 ${
+                isDisliked ? "text-red-500" : "text-gray-400"
+              }`}
             />
-            <span className="text-white">
-              {dislikes}
-            </span>
+            <span className="text-white">{dislikes}</span>
           </button>
           <FaReplyAll className="h-5 w-5 text-gray-400" />
         </div>

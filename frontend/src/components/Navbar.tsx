@@ -18,7 +18,8 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     // Update the active tab based on the current route
-    const currentTab = tabs.find(tab => tab.route === pathname)?.name || "Home";
+    const currentTab =
+      tabs.find((tab) => tab.route === pathname)?.name || "Home";
     setActiveTab(currentTab);
   }, [pathname]);
 
@@ -30,7 +31,7 @@ const Navbar: React.FC = () => {
   return (
     <div className="mt-8 flex justify-center items-center font-rajdhani font-medium text-[20px]">
       <div className="flex space-x-5 bg-[#17151B] bg-opacity-50 backdrop-blur-md px-6 py-4 rounded-xl">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <p
             key={tab.name}
             className={`relative py-2 px-4 rounded-full cursor-pointer text-white transition-all duration-300 transform ease-in-out ${
@@ -40,6 +41,7 @@ const Navbar: React.FC = () => {
             }`}
             onClick={() => handleTabClick(tab.name, tab.route)}
           >
+            {/* Tab text */}
             <span className="relative z-10">{tab.name}</span>
           </p>
         ))}

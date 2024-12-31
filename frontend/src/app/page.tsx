@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import header from "../images/header.png";
@@ -6,27 +8,40 @@ import audio from "../images/audio-design.png";
 import ShufflingCards from "../components/ShufflingCards";
 import Navbar from "../components/Navbar";
 import VoiceEffect from "../components/VoiceEffect";
-import { IoWallet } from "react-icons/io5";
+import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import { useRouter } from "next/navigation";
 
 const App: React.FC = () => {
+  const router = useRouter();
   return (
+    // <LensAuthProvider>
     <div className="font-rajdhani">
       <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen flex flex-col items-center justify-center text-white">
-        <header className="absolute top-6 left-6 flex items-center space-x-2">
-          <Image
-            src={header}
-            alt="Header Logo"
-            width={180}
-            height={90}
-            className="h-30 w-60"
-          />
-        </header>
+        <div className="absolute top-0 w-full flex justify-between items-center p-6">
+          <header className="flex items-center space-x-2">
+            <Image
+              src={header}
+              alt="Header Logo"
+              width={180}
+              height={90}
+              className="h-30 w-60"
+            />
+          </header>
+          <ConnectWalletButton />
+        </div>
 
+<<<<<<< HEAD
         <button className="absolute right-6 top-12 flex items-center justify-center gap-2 bg-black bg-opacity-40 font-semibold backdrop-blur-md p-4 text-[20px] rounded-full ">
           <IoWallet />
           Connect Wallet
         </button>
         <button className="flex items-center justify-center bg-black bg-opacity-40 font-semibold backdrop-blur-md px-4 text-[20px] rounded-full my-10 ">
+=======
+        <button
+          onClick={() => router.push("/profile-setup")}
+          className="flex items-center justify-center bg-black bg-opacity-40 font-semibold backdrop-blur-md px-4 text-[20px] rounded-full my-10"
+        >
+>>>>>>> origin/main
           <Image
             src={image1}
             alt="Voice Sign"
@@ -65,6 +80,7 @@ const App: React.FC = () => {
         </section>
       </div>
     </div>
+    // </LensAuthProvider>
   );
 };
 

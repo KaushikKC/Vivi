@@ -6,18 +6,27 @@ import Image from "next/image";
 import avatar from "../../images/avatar.png";
 import logo from "../../images/vivi1.png";
 import Link from "next/link";
+<<<<<<< HEAD
 import PendingBountyAudioCard from "../../components/PendingBountyAudioCard";
 import PendingBountyTextCard from "../../components/PendingBountyTextCard";
 import ClosedBountyAudioCard from "@/components/ClosedBountyAudioCard";
 import ClosedBountyTextCard from "@/components/ClosedBountyTextCard";
+=======
+import BountyAudioCard from "@/components/BountyAudioCard";
+import BountyTextCard from "@/components/BountyTextCard";
+import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+>>>>>>> origin/main
 
 const Bounty: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<"closed" | "pending">(
     "pending"
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [audioUrl, setAudioUrl] = useState<string>("");
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
+<<<<<<< HEAD
        <div className="absolute flex justify-between w-full top-6">
     <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
      <Link href="/">
@@ -30,8 +39,23 @@ const Bounty: React.FC = () => {
           <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
             0x1D3z.....k2d4
           </p>
+=======
+      <div className="absolute flex justify-between w-full top-6">
+        <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
+          <Link href="/">
+            <Image
+              src={logo}
+              alt="logo"
+              className="ml-10 h-16 w-16 rounded-full"
+            />
+          </Link>
+>>>>>>> origin/main
         </div>
-    </div>
+        <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
+          <Image src={avatar} alt="avatar" className="h-12 w-12" />
+          <ConnectWalletButton />
+        </div>
+      </div>
       <div className="flex justify-center items-center">
         <Navbar />
       </div>
@@ -65,6 +89,7 @@ const Bounty: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Render cards conditionally based on active filter */}
+<<<<<<< HEAD
           {activeFilter === "pending" && (
             <>
               <PendingBountyAudioCard />
@@ -75,6 +100,18 @@ const Bounty: React.FC = () => {
             <>
               <ClosedBountyAudioCard />
               <ClosedBountyTextCard />
+=======
+          {activeFilter === "closed" && (
+            <>
+              <BountyAudioCard audioUrl={audioUrl} />
+              <BountyTextCard />
+            </>
+          )}
+          {activeFilter === "pending" && (
+            <>
+              <BountyAudioCard audioUrl={audioUrl} />
+              <BountyTextCard />
+>>>>>>> origin/main
             </>
           )}
         </div>
