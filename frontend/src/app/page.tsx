@@ -6,6 +6,7 @@ import audio from "../images/audio-design.png";
 import ShufflingCards from "../components/ShufflingCards";
 import Navbar from "../components/Navbar";
 import VoiceEffect from "../components/VoiceEffect";
+import { IoWallet } from "react-icons/io5";
 
 const App: React.FC = () => {
   return (
@@ -30,6 +31,11 @@ const App: React.FC = () => {
             className="h-20 w-20"
           />
           Join the Conversation
+        </button>
+
+        <button className="flex items-center justify-center gap-2 bg-black bg-opacity-40 font-semibold backdrop-blur-md p-4 text-[20px] rounded-full mb-4">
+          <IoWallet />
+          Connect Wallet
         </button>
 
         <main className="text-center font-zenDots flex flex-col items-center justify-center">

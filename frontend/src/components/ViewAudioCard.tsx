@@ -9,6 +9,7 @@ import { IoMdShare } from "react-icons/io";
 import close from "../images/close.png";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import Link from "next/link";
+import AudioPlayer from "./AudioPlayer";
 
 function ViewAudioCard() {
   const [likes, setLikes] = useState(0);
@@ -61,9 +62,9 @@ function ViewAudioCard() {
           </div>
         </div>
       </div>
-      <div className="my-3">
-        <div className="bg-gray-700 p-3 rounded-md text-center text-sm">
-          🎙️ Audio Content
+      <div className="my-3 flex justify-center w-fit">
+        <div className="w-fit bg-gray-700/50 rounded-lg p-2">
+          <AudioPlayer />
         </div>
       </div>
       <div className="flex items-center justify-between">
