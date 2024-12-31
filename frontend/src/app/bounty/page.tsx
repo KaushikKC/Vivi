@@ -14,7 +14,7 @@ const Bounty: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<"closed" | "pending">(
     "pending"
   );
-  const [audioUrl, setAudioUrl] = useState<string>("");
+  const [audioUrl, _setAudioUrl] = useState<string>("");
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">

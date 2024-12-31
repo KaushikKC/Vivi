@@ -7,7 +7,6 @@ import avatar from "../../images/avatar.png";
 import { FaMicrophone } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { LuMessageSquareText } from "react-icons/lu";
-import AudioCard from "../../components/AudioCard";
 import logo from "../../images/vivi1.png";
 import Link from "next/link";
 import CommentAudioCard from "@/components/CommentAudioCard";
