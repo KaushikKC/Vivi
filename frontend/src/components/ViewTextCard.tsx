@@ -67,6 +67,18 @@ function ViewTextCard() {
           industry.
         </p>
       </div>
+      {/* Attach Bounty */}
+      <div className="relative p-3 border-2 rounded-xl w-auto border-[#7482F1] my-5">
+        <div className="absolute -top-4 left-3 bg-gray-800 px-2 text-white font-semibold text-[18px]">
+          Attach Bounty
+        </div>
+        <input
+          type="text"
+          className="bg-transparent text-white w-full focus:outline-none"
+          placeholder="Enter bounty in ETH"
+          defaultValue="0.005 ETH"
+        />
+      </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button onClick={handleLike} className="flex items-center gap-1">

@@ -73,8 +73,8 @@ const Details: React.FC = () => {
         </Link>
      </div>
       <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-          <Image src={avatar} alt="avatar" className="h-12 w-12" />
-          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
+      <Link href="/profile">
+      <Image src={avatar} alt="avatar" className="h-12 w-12" /></Link>          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
             0x1D3z.....k2d4
           </p>
         </div>

@@ -9,8 +9,9 @@ import { IoMdShare } from "react-icons/io";
 import close from "../images/close.png";
 import { FaReplyAll, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import Link from "next/link";
+import AudioPlayer from "./AudioPlayer";
 
-function BountyTextCard() {
+function ClosedBountyAudioCard() {
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4">
       <div className="flex items-center justify-between">
@@ -28,11 +29,10 @@ function BountyTextCard() {
           </div>
         </div>
       </div>
-      <div className="my-3">
-        <p className="text-[17px]">
-          Lorem ipsum is simply dummy text of the printing and typesetting
-          industry.
-        </p>
+      <div className="my-3 flex justify-center w-fit">
+        <div className="w-fit bg-gray-700/50 rounded-lg p-2">
+          <AudioPlayer />
+        </div>
       </div>
       <div className="flex space-x-4">
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
@@ -51,13 +51,28 @@ function BountyTextCard() {
           </p>
         </div>
       </div>
-      <div className="flex justify-center">
-        <button className="text-[16px] mt-3 font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200 whitespace-nowrap ">
-          Award Manually
-        </button>
+
+      {/* New Section: Rewarded User */}
+      <div className="mt-4 bg-gray-700 p-3 rounded-lg">
+        <p className="text-gray-400 text-sm font-medium ">Rewarded User:</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Image
+              src={avatar}
+              alt=""
+              className="w-10 h-10 bg-gray-700 rounded-full"
+            />
+            <div>
+              <h3 className="text-[16px] font-semibold">John Doe</h3>
+            </div>
+          </div>
+          <div className="bg-gray-600 px-3 py-1 rounded-lg">
+            <p className="text-white font-semibold">0.05 ETH</p>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-export default BountyTextCard;
+export default ClosedBountyAudioCard;

@@ -22,7 +22,11 @@ const App: React.FC = () => {
           />
         </header>
 
-        <button className="flex items-center justify-center bg-black bg-opacity-40 font-semibold backdrop-blur-md px-4 text-[20px] rounded-full my-10">
+        <button className="absolute right-6 top-12 flex items-center justify-center gap-2 bg-black bg-opacity-40 font-semibold backdrop-blur-md p-4 text-[20px] rounded-full ">
+          <IoWallet />
+          Connect Wallet
+        </button>
+        <button className="flex items-center justify-center bg-black bg-opacity-40 font-semibold backdrop-blur-md px-4 text-[20px] rounded-full my-10 ">
           <Image
             src={image1}
             alt="Voice Sign"
@@ -31,11 +35,6 @@ const App: React.FC = () => {
             className="h-20 w-20"
           />
           Join the Conversation
-        </button>
-
-        <button className="flex items-center justify-center gap-2 bg-black bg-opacity-40 font-semibold backdrop-blur-md p-4 text-[20px] rounded-full mb-4">
-          <IoWallet />
-          Connect Wallet
         </button>
 
         <main className="text-center font-zenDots flex flex-col items-center justify-center">

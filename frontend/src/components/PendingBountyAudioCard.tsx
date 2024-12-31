@@ -3,15 +3,21 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import avatar from "../images/avatar.png";
-import { TiThumbsDown, TiThumbsUp } from "react-icons/ti";
-import { BiSolidCommentDetail } from "react-icons/bi";
-import { IoMdShare } from "react-icons/io";
-import close from "../images/close.png";
-import { FaReplyAll, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import Link from "next/link";
 import AudioPlayer from "./AudioPlayer";
+import AwardPopup from "./AwardPopup"; // Import the AwardPopup component
 
-function BountyAudioCard() {
+function PendingBountyAudioCard() {
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+
+  // Handle reward payment
+  const handlePayReward = (selectedUser: string) => {
+    alert(`Reward paid to ${selectedUser}`);
+    // Implement logic for paying the reward to the selected user.
+  };
+
+  // Toggle popup visibility
+  const togglePopup = () => setIsPopupVisible(!isPopupVisible);
+
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4">
       <div className="flex items-center justify-between">
@@ -52,12 +58,24 @@ function BountyAudioCard() {
         </div>
       </div>
       <div className="flex justify-center">
-        <button className="text-[16px] mt-3 font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200 whitespace-nowrap ">
+        <button
+          onClick={togglePopup}
+          className="text-[16px] mt-3 font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200 whitespace-nowrap"
+        >
           Award Manually
         </button>
       </div>
+
+      {/* Use the AwardPopup component */}
+      <AwardPopup
+        isVisible={isPopupVisible}
+        onClose={togglePopup}
+        onPayReward={handlePayReward}
+        bountyAmount="0.05 ETH"
+        totalResponses={20}
+      />
     </section>
   );
 }
 
-export default BountyAudioCard;
+export default PendingBountyAudioCard;

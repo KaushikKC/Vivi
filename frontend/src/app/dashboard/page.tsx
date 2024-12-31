@@ -84,8 +84,8 @@ const Dashboard: React.FC = () => {
         </Link>
      </div>
       <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-          <Image src={avatar} alt="avatar" className="h-12 w-12" />
-          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
+      <Link href="/profile">
+      <Image src={avatar} alt="avatar" className="h-12 w-12" /></Link>          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
             0x1D3z.....k2d4
           </p>
         </div>
@@ -120,18 +120,7 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Attach Bounty */}
-              <div className="relative p-3 border-2 rounded-xl w-auto border-[#7482F1]">
-                <div className="absolute -top-4 left-3 bg-gray-800 px-2 text-white font-semibold text-[18px]">
-                  Attach Bounty
-                </div>
-                <input
-                  type="text"
-                  className="bg-transparent text-white w-full focus:outline-none"
-                  placeholder="Enter bounty in ETH"
-                  defaultValue="0.005 ETH"
-                />
-              </div>
+            
 
               
         {/* Post Dropdown */}

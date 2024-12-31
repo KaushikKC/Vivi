@@ -6,8 +6,10 @@ import Image from "next/image";
 import avatar from "../../images/avatar.png";
 import logo from "../../images/vivi1.png";
 import Link from "next/link";
-import BountyAudioCard from "@/components/BountyAudioCard";
-import BountyTextCard from "@/components/BountyTextCard";
+import PendingBountyAudioCard from "../../components/PendingBountyAudioCard";
+import PendingBountyTextCard from "../../components/PendingBountyTextCard";
+import ClosedBountyAudioCard from "@/components/ClosedBountyAudioCard";
+import ClosedBountyTextCard from "@/components/ClosedBountyTextCard";
 
 const Bounty: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<"closed" | "pending">(
@@ -23,7 +25,8 @@ const Bounty: React.FC = () => {
         </Link>
      </div>
       <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-          <Image src={avatar} alt="avatar" className="h-12 w-12" />
+<Link href="/profile">
+<Image src={avatar} alt="avatar" className="h-12 w-12" /></Link>
           <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
             0x1D3z.....k2d4
           </p>
@@ -62,16 +65,16 @@ const Bounty: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Render cards conditionally based on active filter */}
-          {activeFilter === "closed" && (
-            <>
-              <BountyAudioCard />
-              <BountyTextCard />
-            </>
-          )}
           {activeFilter === "pending" && (
             <>
-              <BountyAudioCard />
-              <BountyTextCard />
+              <PendingBountyAudioCard />
+              <PendingBountyTextCard />
+            </>
+          )}
+          {activeFilter === "closed" && (
+            <>
+              <ClosedBountyAudioCard />
+              <ClosedBountyTextCard />
             </>
           )}
         </div>
