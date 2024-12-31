@@ -11,7 +11,8 @@ import ViewTextCard from "@/components/ViewTextCard";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
 const Profile: React.FC = () => {
-  const [audioUrl, _setAudioUrl] = useState<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [audioUrl, setAudioUrl] = useState<string>("");
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
       <div className="absolute flex justify-between w-full top-6">
