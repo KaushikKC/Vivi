@@ -6,9 +6,11 @@ import audio from "../images/audio-design.png";
 import ShufflingCards from "../components/ShufflingCards";
 import Navbar from "../components/Navbar";
 import VoiceEffect from "../components/VoiceEffect";
+// import { LensAuthProvider } from "@/context/LensAuthContext";
 
 const App: React.FC = () => {
   return (
+    // <LensAuthProvider>
     <div className="font-rajdhani">
       <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen flex flex-col items-center justify-center text-white">
         <header className="absolute top-6 left-6 flex items-center space-x-2">
@@ -60,6 +62,7 @@ const App: React.FC = () => {
         </section>
       </div>
     </div>
+    // </LensAuthProvider>
   );
 };
 
