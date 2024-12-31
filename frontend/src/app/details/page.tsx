@@ -66,21 +66,21 @@ const Details: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
-      <div className="flex justify-between items-center">
-        <Link href="/">
-          <Image
-            src={logo}
-            alt="logo"
-            className="ml-10 h-16 w-16 rounded-full"
-          />
+         <div className="absolute flex justify-between w-full top-6">
+    <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
+     <Link href="/">
+          <Image src={logo} alt="logo" className="ml-10 h-16 w-16 rounded-full" />
         </Link>
-        <Navbar />
-        <div className="flex items-center justify-center space-x-3 mr-5">
+     </div>
+      <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
           <Image src={avatar} alt="avatar" className="h-12 w-12" />
           <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
             0x1D3z.....k2d4
           </p>
         </div>
+    </div>
+      <div className="flex justify-center items-center">
+        <Navbar />
       </div>
 
       <main className="p-4 max-w-3xl mx-auto">
