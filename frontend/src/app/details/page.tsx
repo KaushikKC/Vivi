@@ -62,30 +62,13 @@ function Details() {
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
-<<<<<<< HEAD
          <div className="absolute flex justify-between w-full top-6">
     <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
      <Link href="/">
           <Image src={logo} alt="logo" className="ml-10 h-16 w-16 rounded-full" />
         </Link>
      </div>
-      <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-      <Link href="/profile">
-      <Image src={avatar} alt="avatar" className="h-12 w-12" /></Link>          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
-            0x1D3z.....k2d4
-          </p>
-=======
-      <div className="absolute flex justify-between w-full top-6">
-        <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
-          <Link href="/">
-            <Image
-              src={logo}
-              alt="logo"
-              className="ml-10 h-16 w-16 rounded-full"
-            />
-          </Link>
->>>>>>> origin/main
-        </div>
+     
         <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
           <Image src={avatar} alt="avatar" className="h-12 w-12" />
           <ConnectWalletButton />
@@ -209,7 +192,8 @@ function Details() {
         <CommentAudioCard audioUrl={audioUrl} />
         <CommentTextCard />
       </main>
-    </div>
+      </div>
+    
   );
 }
 

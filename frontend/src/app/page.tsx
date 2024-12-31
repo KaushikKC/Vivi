@@ -30,18 +30,10 @@ const App: React.FC = () => {
           <ConnectWalletButton />
         </div>
 
-<<<<<<< HEAD
-        <button className="absolute right-6 top-12 flex items-center justify-center gap-2 bg-black bg-opacity-40 font-semibold backdrop-blur-md p-4 text-[20px] rounded-full ">
-          <IoWallet />
-          Connect Wallet
-        </button>
-        <button className="flex items-center justify-center bg-black bg-opacity-40 font-semibold backdrop-blur-md px-4 text-[20px] rounded-full my-10 ">
-=======
         <button
           onClick={() => router.push("/profile-setup")}
           className="flex items-center justify-center bg-black bg-opacity-40 font-semibold backdrop-blur-md px-4 text-[20px] rounded-full my-10"
         >
->>>>>>> origin/main
           <Image
             src={image1}
             alt="Voice Sign"

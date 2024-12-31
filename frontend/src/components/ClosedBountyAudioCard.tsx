@@ -5,15 +5,11 @@ import React from "react";
 import avatar from "../images/avatar.png";
 import AudioPlayer from "./AudioPlayer";
 
-<<<<<<< HEAD:frontend/src/components/ClosedBountyAudioCard.tsx
-function ClosedBountyAudioCard() {
-=======
 interface BountyAudioCardProps {
   audioUrl: string;
 }
 
-function BountyAudioCard({ audioUrl }: BountyAudioCardProps) {
->>>>>>> origin/main:frontend/src/components/BountyAudioCard.tsx
+function ClosedBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4">
       <div className="flex items-center justify-between">

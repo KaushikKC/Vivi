@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
 
   const tabs: { name: string; route: string }[] = [
     { name: "Home", route: "/" },
-    { name: "Posts", route: "/dashboard" },
+    { name: "Posts", route: "/post" },
     { name: "Bounties", route: "/bounty" },
     { name: "Profile", route: "/profile" },
     { name: "About Us", route: "/about" },

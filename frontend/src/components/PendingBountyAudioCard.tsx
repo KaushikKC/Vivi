@@ -6,7 +6,11 @@ import avatar from "../images/avatar.png";
 import AudioPlayer from "./AudioPlayer";
 import AwardPopup from "./AwardPopup"; // Import the AwardPopup component
 
-function PendingBountyAudioCard() {
+interface BountyAudioCardProps {
+  audioUrl: string;
+}
+
+function PendingBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
   // Handle reward payment
@@ -37,7 +41,7 @@ function PendingBountyAudioCard() {
       </div>
       <div className="my-3 flex justify-center w-fit">
         <div className="w-fit bg-gray-700/50 rounded-lg p-2">
-          <AudioPlayer />
+          <AudioPlayer audioUrl={audioUrl} />
         </div>
       </div>
       <div className="flex space-x-4">

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import avatar from "../../images/avatar.png"; // Default avatar
 import logo from "../../images/vivi1.png";
 import Link from "next/link";
@@ -11,11 +11,10 @@ import ViewTextCard from "@/components/ViewTextCard";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
 const Profile: React.FC = () => {
-<<<<<<< HEAD
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("Madhu Varsha");
   const [bio, setBio] = useState("Write a description about yourself");
-  const [avatarUrl, setAvatarUrl] = useState(avatar); // Avatar image state
+  const [avatarUrl, setAvatarUrl] = useState<string | StaticImageData>(avatar); // Avatar image state
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -30,14 +29,13 @@ const Profile: React.FC = () => {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setAvatarUrl(URL.createObjectURL(file)); // Update avatar image
+      setAvatarUrl(URL.createObjectURL(file)); // Update avatar image with string URL
     }
   };
-
-=======
+  
+  
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [audioUrl, setAudioUrl] = useState<string>("");
->>>>>>> origin/main
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
       <div className="absolute flex justify-between w-full top-6">
@@ -50,19 +48,10 @@ const Profile: React.FC = () => {
             />
           </Link>
         </div>
-<<<<<<< HEAD
-        <div className="right-0 flex items-center justify-end space-x-3 mr-5">
-          <Link href="/profile">
-            <Image src={avatarUrl} alt="avatar" className="h-12 w-12" />
-          </Link>
-          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
-            0x1D3z.....k2d4
-          </p>
-=======
+        
         <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
           <Image src={avatar} alt="avatar" className="h-12 w-12" />
           <ConnectWalletButton />
->>>>>>> origin/main
         </div>
       </div>
       <div className="flex justify-center items-center">
@@ -148,6 +137,7 @@ const Profile: React.FC = () => {
         </div>
       </main>
     </div>
+  
   );
 };
 
