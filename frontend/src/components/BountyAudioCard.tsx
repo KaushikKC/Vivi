@@ -1,14 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 import avatar from "../images/avatar.png";
-import { TiThumbsDown, TiThumbsUp } from "react-icons/ti";
-import { BiSolidCommentDetail } from "react-icons/bi";
-import { IoMdShare } from "react-icons/io";
-import close from "../images/close.png";
-import { FaReplyAll, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import Link from "next/link";
 import AudioPlayer from "./AudioPlayer";
 
 function BountyAudioCard() {

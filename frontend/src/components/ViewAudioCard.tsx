@@ -3,12 +3,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import avatar from "../images/avatar.png";
-import { TiThumbsDown, TiThumbsUp } from "react-icons/ti";
-import { BiSolidCommentDetail } from "react-icons/bi";
-import { IoMdShare } from "react-icons/io";
-import close from "../images/close.png";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import Link from "next/link";
 import AudioPlayer from "./AudioPlayer";
 
 function ViewAudioCard() {
@@ -71,23 +66,19 @@ function ViewAudioCard() {
         <div className="flex items-center gap-4">
           <button onClick={handleLike} className="flex items-center gap-1">
             <FaThumbsUp
-              className={`h-5 w-5 ${isLiked
-                ? "text-blue-500"
-                : "text-gray-400"}`}
+              className={`h-5 w-5 ${
+                isLiked ? "text-blue-500" : "text-gray-400"
+              }`}
             />
-            <span className="text-white">
-              {likes}
-            </span>
+            <span className="text-white">{likes}</span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
-              className={`h-5 w-5 ${isDisliked
-                ? "text-red-500"
-                : "text-gray-400"}`}
+              className={`h-5 w-5 ${
+                isDisliked ? "text-red-500" : "text-gray-400"
+              }`}
             />
-            <span className="text-white">
-              {dislikes}
-            </span>
+            <span className="text-white">{dislikes}</span>
           </button>
         </div>
       </div>

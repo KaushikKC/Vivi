@@ -8,9 +8,6 @@ import audio from "../images/audio-design.png";
 import ShufflingCards from "../components/ShufflingCards";
 import Navbar from "../components/Navbar";
 import VoiceEffect from "../components/VoiceEffect";
-import { ConnectKitButton } from "connectkit";
-// import { LensAuthProvider } from "@/context/LensAuthContext";
-import { IoWallet } from "react-icons/io5";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 import { useRouter } from "next/navigation";
 
