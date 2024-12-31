@@ -8,6 +8,7 @@ import logo from "../../images/vivi1.png";
 import Link from "next/link";
 import ViewAudioCard from "@/components/ViewAudioCard";
 import ViewTextCard from "@/components/ViewTextCard";
+import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
 const Profile: React.FC = () => {
   return (
@@ -24,9 +25,7 @@ const Profile: React.FC = () => {
         </div>
         <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
           <Image src={avatar} alt="avatar" className="h-12 w-12" />
-          <p className="border border-white rounded-full text-[18px] p-2 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] to-[#3AAEF8] font-semibold">
-            0x1D3z.....k2d4
-          </p>
+          <ConnectWalletButton />
         </div>
       </div>
       <div className="flex justify-center items-center">
