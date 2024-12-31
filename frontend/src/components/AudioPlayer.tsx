@@ -9,9 +9,12 @@ const AudioPlayer = ({ audioUrl }: AudioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef(new Audio(audioUrl));
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    // Initialize audio element on client side only
+    audioRef.current = new Audio(audioUrl);
+
     const audio = audioRef.current;
     audio.addEventListener("loadedmetadata", () => setDuration(audio.duration));
     audio.addEventListener("timeupdate", () =>
@@ -20,17 +23,22 @@ const AudioPlayer = ({ audioUrl }: AudioPlayerProps) => {
     audio.addEventListener("ended", () => setIsPlaying(false));
 
     return () => {
-      audio.removeEventListener("loadedmetadata", () =>
-        setDuration(audio.duration)
-      );
-      audio.removeEventListener("timeupdate", () =>
-        setCurrentTime(audio.currentTime)
-      );
-      audio.removeEventListener("ended", () => setIsPlaying(false));
+      if (audio) {
+        audio.removeEventListener("loadedmetadata", () =>
+          setDuration(audio.duration)
+        );
+        audio.removeEventListener("timeupdate", () =>
+          setCurrentTime(audio.currentTime)
+        );
+        audio.removeEventListener("ended", () => setIsPlaying(false));
+        audio.pause();
+      }
     };
   }, [audioUrl]);
 
   const togglePlay = () => {
+    if (!audioRef.current) return;
+
     if (isPlaying) {
       audioRef.current.pause();
     } else {
