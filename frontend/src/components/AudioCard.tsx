@@ -8,6 +8,7 @@ import { BiSolidCommentDetail } from "react-icons/bi";
 import { IoMdShare } from "react-icons/io";
 import close from "../images/close.png";
 import Link from "next/link";
+import AudioPlayer from "./AudioPlayer";
 
 const AudioCard: React.FC = () => {
   const [likes, setLikes] = useState<number>(0);
@@ -62,9 +63,7 @@ const AudioCard: React.FC = () => {
         <Image src={close} alt="Close icon" className="h-5 w-5" />
       </div>
       <div className="my-3">
-        <div className="bg-gray-700 p-3 rounded-md text-center text-sm">
-          🎙️ Audio Content
-        </div>
+        <AudioPlayer />
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -88,7 +87,9 @@ const AudioCard: React.FC = () => {
               {dislikes}
             </span>
           </button>
-          <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
+          <Link href="/details">
+            <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
+          </Link>
           <IoMdShare className="h-5 w-5 text-gray-400" />
         </div>
         <Link href="/details">
