@@ -11,6 +11,7 @@ import ViewTextCard from "@/components/ViewTextCard";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
 const Profile: React.FC = () => {
+  const [audioUrl, setAudioUrl] = useState<string>("");
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
       <div className="absolute flex justify-between w-full top-6">
@@ -62,8 +63,8 @@ const Profile: React.FC = () => {
           <p className="cursor-pointer hover:underline">See all</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ViewAudioCard />
-          <ViewAudioCard />
+          <ViewAudioCard audioUrl={audioUrl} />
+          <ViewAudioCard audioUrl={audioUrl} />
           <ViewTextCard />
           <ViewTextCard />
         </div>

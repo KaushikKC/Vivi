@@ -5,7 +5,11 @@ import React from "react";
 import avatar from "../images/avatar.png";
 import AudioPlayer from "./AudioPlayer";
 
-function BountyAudioCard() {
+interface BountyAudioCardProps {
+  audioUrl: string;
+}
+
+function BountyAudioCard({ audioUrl }: BountyAudioCardProps) {
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4">
       <div className="flex items-center justify-between">
@@ -25,7 +29,7 @@ function BountyAudioCard() {
       </div>
       <div className="my-3 flex justify-center w-fit">
         <div className="w-fit bg-gray-700/50 rounded-lg p-2">
-          <AudioPlayer />
+          <AudioPlayer audioUrl={audioUrl} />
         </div>
       </div>
       <div className="flex space-x-4">

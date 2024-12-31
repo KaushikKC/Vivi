@@ -6,7 +6,10 @@ import avatar from "../images/avatar.png";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import AudioPlayer from "./AudioPlayer";
 
-function ViewAudioCard() {
+interface ViewAudioCardProps {
+  audioUrl: string;
+}
+function ViewAudioCard({ audioUrl }: ViewAudioCardProps) {
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -59,7 +62,7 @@ function ViewAudioCard() {
       </div>
       <div className="my-3 flex justify-center w-fit">
         <div className="w-fit bg-gray-700/50 rounded-lg p-2">
-          <AudioPlayer />
+          <AudioPlayer audioUrl={audioUrl} />
         </div>
       </div>
       <div className="flex items-center justify-between">

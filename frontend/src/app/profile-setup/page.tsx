@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import header from "../../images/header.png";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 const ProfileSetup: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +12,7 @@ const ProfileSetup: React.FC = () => {
     lensId: "",
     profilePicture: null as File | null,
   });
-  const router = useRouter();
+  //   const router = useRouter();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

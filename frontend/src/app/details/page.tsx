@@ -5,7 +5,7 @@ import Navbar from "../../components/Navbar";
 import Image from "next/image";
 import avatar from "../../images/avatar.png";
 import { FaMicrophone } from "react-icons/fa";
-import { IoMdArrowDropdown, IoMdImages } from "react-icons/io";
+import { IoMdArrowDropdown } from "react-icons/io";
 import { LuMessageSquareText } from "react-icons/lu";
 import AudioCard from "../../components/AudioCard";
 import logo from "../../images/vivi1.png";
@@ -15,16 +15,14 @@ import CommentTextCard from "@/components/CommentTextCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
-const Details: React.FC = () => {
+function Details() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string>("");
   const [postType, setPostType] = useState<"text" | "audio">("text");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleRecordClick = async () => {
     if (!isRecording) {
@@ -86,7 +84,7 @@ const Details: React.FC = () => {
 
       <main className="p-4 max-w-3xl mx-auto">
         {/* Post */}
-        <AudioCard />
+        <AudioPlayer audioUrl={audioUrl} />
 
         <section className="mt-6 bg-gray-800 p-5 rounded-lg">
           <h2 className="text-2xl font-zenDots mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8]">
@@ -195,11 +193,11 @@ const Details: React.FC = () => {
             )}
           </div>
         </section>
-        <CommentAudioCard />
+        <CommentAudioCard audioUrl={audioUrl} />
         <CommentTextCard />
       </main>
     </div>
   );
-};
+}
 
 export default Details;

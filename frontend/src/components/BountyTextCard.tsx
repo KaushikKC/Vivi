@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 import avatar from "../images/avatar.png";
 
 function BountyTextCard() {

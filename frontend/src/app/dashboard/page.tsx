@@ -18,7 +18,7 @@ const Dashboard: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [postType, setPostType] = useState<"text" | "audio">("text");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -241,7 +241,7 @@ const Dashboard: React.FC = () => {
         </section>
 
         {/* Posts */}
-        <AudioCard />
+        <AudioCard audioUrl={audioUrl} />
         <TextCard />
       </main>
     </div>

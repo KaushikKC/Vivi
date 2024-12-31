@@ -14,6 +14,7 @@ const Bounty: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<"closed" | "pending">(
     "pending"
   );
+  const [audioUrl, setAudioUrl] = useState<string>("");
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
@@ -67,13 +68,13 @@ const Bounty: React.FC = () => {
           {/* Render cards conditionally based on active filter */}
           {activeFilter === "closed" && (
             <>
-              <BountyAudioCard />
+              <BountyAudioCard audioUrl={audioUrl} />
               <BountyTextCard />
             </>
           )}
           {activeFilter === "pending" && (
             <>
-              <BountyAudioCard />
+              <BountyAudioCard audioUrl={audioUrl} />
               <BountyTextCard />
             </>
           )}
