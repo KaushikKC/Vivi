@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
     functionName: "postCount",
   });
 
-  const { writeContract, isError, isSuccess } = useWriteContract();
+  const { writeContract } = useWriteContract();
 
   const convertBigIntToString = (value: bigint | null | undefined): string => {
     if (!value) return "1";
@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
           ],
         },
         {
-          onSuccess: async (hash) => {
+          onSuccess: async () => {
             try {
               const apiResponse = await axios.post(
                 "http://localhost:3500/api/posts",
