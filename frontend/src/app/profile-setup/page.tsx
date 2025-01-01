@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import header from "../../images/header.png";
 import axios from "axios";
-import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import ConnectWalletSection from "@/components/ConnectWalletButton";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 
@@ -116,7 +116,7 @@ const ProfileSetup: React.FC = () => {
               className="h-30 w-60"
             />
           </header>
-          <ConnectWalletButton />
+          <ConnectWalletSection />
         </div>
 
         <div className="mt-32 w-full max-w-lg p-8 bg-black bg-opacity-40 backdrop-blur-md rounded-2xl">

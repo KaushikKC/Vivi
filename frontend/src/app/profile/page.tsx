@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Image, { StaticImageData } from "next/image";
 import avatar from "../../images/avatar.png"; // Default avatar
@@ -8,13 +8,44 @@ import logo from "../../images/vivi1.png";
 import Link from "next/link";
 import ViewAudioCard from "@/components/ViewAudioCard";
 import ViewTextCard from "@/components/ViewTextCard";
-import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import ConnectWalletSection from "@/components/ConnectWalletButton";
+import { useAccount } from "wagmi";
 
 const Profile: React.FC = () => {
+  const { address } = useAccount();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("Madhu Varsha");
-  const [bio, setBio] = useState("Write a description about yourself");
-  const [avatarUrl, setAvatarUrl] = useState<string | StaticImageData>(avatar); // Avatar image state
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | StaticImageData>(avatar);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!address) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3500/api/users/profile/${address}`
+        );
+        if (response.ok) {
+          const userData = await response.json();
+          setName(userData.name || "");
+          setBio(userData.bio || "");
+          // If the user has an avatar URL from the backend
+          if (userData.profilePicture) {
+            setAvatarUrl(userData.profilePicture);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [address]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -32,8 +63,7 @@ const Profile: React.FC = () => {
       setAvatarUrl(URL.createObjectURL(file)); // Update avatar image with string URL
     }
   };
-  
-  
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [audioUrl, setAudioUrl] = useState<string>("");
   return (
@@ -48,11 +78,8 @@ const Profile: React.FC = () => {
             />
           </Link>
         </div>
-        
-        <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-          <Image src={avatar} alt="avatar" className="h-12 w-12" />
-          <ConnectWalletButton />
-        </div>
+
+        <ConnectWalletSection />
       </div>
       <div className="flex justify-center items-center">
         <Navbar />
@@ -62,62 +89,69 @@ const Profile: React.FC = () => {
         {/* Create a new Post */}
         <section className="mb-6 bg-gray-800 p-5 rounded-lg">
           <div className="flex gap-5 items-center">
-        <div className="relative">
-  <Image
-    src={avatarUrl}
-    alt="avatar"
-    className="border-2 border-white h-20 w-20 rounded-full object-cover"
-  />
-  {isEditing && (
-    <input
-      type="file"
-      accept="image/*"
-      onChange={handleAvatarChange}
-      className="absolute bottom-0 right-0 opacity-0 cursor-pointer"
-    />
-  )}
-</div>
-          <div className="flex my-2 space-x-3">
-            <div className="flex flex-col">
-              <p className="text-[24px] font-semibold truncate">
-                {isEditing
-                  ? <input
+            <div className="relative">
+              <Image
+                src={avatarUrl}
+                alt="avatar"
+                width={30}
+                height={30}
+                className="border-2 border-white h-20 w-20 rounded-full object-cover"
+              />
+              {isEditing && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="absolute bottom-0 right-0 opacity-0 cursor-pointer"
+                />
+              )}
+            </div>
+            <div className="flex my-2 space-x-3">
+              <div className="flex flex-col">
+                <p className="text-[24px] font-semibold truncate">
+                  {isEditing ? (
+                    <input
                       type="text"
                       className="bg-transparent text-white w-full focus:outline-none"
                       value={name}
-                      onChange={e => setName(e.target.value)}
+                      onChange={(e) => setName(e.target.value)}
                     />
-                  : name}
-              </p>
-              <div>
-                {isEditing
-                  ? <textarea
+                  ) : (
+                    name
+                  )}
+                </p>
+                <div>
+                  {isEditing ? (
+                    <textarea
                       className="bg-transparent text-white w-full focus:outline-none"
                       placeholder="Write a description about yourself"
                       value={bio}
-                      onChange={e => setBio(e.target.value)}
+                      onChange={(e) => setBio(e.target.value)}
                     />
-                  : <p>{bio}</p>}
+                  ) : (
+                    <p>{bio}</p>
+                  )}
+                </div>
               </div>
-              
-            </div>
-            
-            <div className="flex justify-end w-full">
-              {isEditing
-                ? <button
+
+              <div className="flex justify-end w-full">
+                {isEditing ? (
+                  <button
                     className="border border-white bg-transparent text-white p-2 rounded-md h-fit"
                     onClick={handleSave}
                   >
                     Save
                   </button>
-                : <button
+                ) : (
+                  <button
                     className="border border-white bg-transparent text-white p-2 rounded-md h-fit"
                     onClick={handleEdit}
                   >
                     Edit
-                  </button>}
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
           </div>
         </section>
         <div className="flex justify-between items-center">
@@ -137,7 +171,6 @@ const Profile: React.FC = () => {
         </div>
       </main>
     </div>
-  
   );
 };
 

@@ -7,6 +7,9 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    postId: {
+      type: Number,
+    },
     postType: {
       type: String,
       enum: ["TEXT", "VOICE"],
@@ -42,10 +45,6 @@ const postSchema = new mongoose.Schema(
       default: ethers.ZeroAddress,
     },
     bountyContentHash: String,
-    metadata: {
-      type: Object,
-      required: true,
-    },
     bountyMetadata: {
       type: Object,
     },
@@ -64,6 +63,19 @@ const postSchema = new mongoose.Schema(
     commentCount: {
       type: Number,
       default: 0,
+    },
+    postId: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    isAnonymous: {
+      type: Boolean,
+      default: false,
+    },
+    timestamp: {
+      type: Number,
+      default: Date.now,
     },
   },
   {

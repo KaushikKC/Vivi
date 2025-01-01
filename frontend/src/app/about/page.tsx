@@ -5,8 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import logo from "../../images/vivi1.png";
-import avatar from "../../images/avatar.png";
-import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import ConnectWalletSection from "@/components/ConnectWalletButton";
 
 const AboutUs: React.FC = () => {
   return (
@@ -25,10 +24,7 @@ const AboutUs: React.FC = () => {
         </div>
         {/* User Avatar */}
 
-        <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-          <Image src={avatar} alt="avatar" className="h-12 w-12" />
-          <ConnectWalletButton />
-        </div>
+        <ConnectWalletSection />
       </div>
 
       {/* Navbar */}
@@ -80,37 +76,33 @@ const AboutUs: React.FC = () => {
                 title: "Voice-Activated Q&A",
                 description:
                   "Users can ask and answer questions using voice commands, making the platform more interactive and accessible.",
-                emoji: "🎤"
+                emoji: "🎤",
               },
               {
                 title: "Voice-to-Text Integration",
                 description:
                   "Our voice-to-text feature converts voice responses or questions into accurate text, providing a hands-free, accessible experience for users who prefer speaking over typing.",
-                emoji: "📝"
+                emoji: "📝",
               },
               {
                 title: "Decentralized Knowledge Sharing",
                 description:
                   "Vivi runs on a decentralized network, ensuring secure, private, and transparent data, giving users control over their knowledge and contributions.",
-                emoji: "🔗"
-              }
-            ].map((feature, index) =>
+                emoji: "🔗",
+              },
+            ].map((feature, index) => (
               <div
                 key={index}
                 className="bg-gray-800 p-8 rounded-3xl shadow-2xl hover:scale-105 hover:-rotate-3 transition-all duration-300 ease-in-out animate-fadeIn opacity-0"
                 style={{ animationDelay: `${0.7 + index * 0.2}s` }}
               >
-                <div className="text-2xl mb-4">
-                  {feature.emoji}
-                </div>
+                <div className="text-2xl mb-4">{feature.emoji}</div>
                 <h3 className="text-xl font-semibold mb-3 font-zenDots">
                   {feature.title}
                 </h3>
-                <p className="text-lg">
-                  {feature.description}
-                </p>
+                <p className="text-lg">{feature.description}</p>
               </div>
-            )}
+            ))}
           </div>
         </section>
 

@@ -30,9 +30,17 @@ const upload = multer({
  * @desc Upload content to IPFS and return hash
  * @access Private
  */
-router.post("/", authMiddleware, upload.single("voice"), async (req, res) => {
+router.post("/", upload.single("voice"), async (req, res) => {
   try {
-    const { type, author, content: textContent } = req.body;
+    const {
+      type,
+      author,
+      content: textContent,
+      postId,
+      isAnonymous,
+      timestamp,
+      metadataHash,
+    } = req.body;
     let content = {};
 
     // Handle TEXT posts
@@ -58,42 +66,26 @@ router.post("/", authMiddleware, upload.single("voice"), async (req, res) => {
         fileSize: req.file.size,
       };
     }
-    // Create metadata object
-    const metadata = {
-      type: type || "TEXT",
-      author: author || req.walletAddress,
-      timestamp: Date.now(),
-      ...(type === "VOICE" && {
-        fileName: content.voice?.fileName,
-        fileSize: content.voice?.fileSize,
-        contentType: content.voice?.contentType,
-      }),
-    };
-
-    // Upload to IPFS
-    const ipfsContent = {
-      ...(type === "TEXT" && { content: content.text }),
-      metadata,
-    };
-    const result = await ipfs.add(JSON.stringify(ipfsContent));
 
     // Create post
     const post = new Post({
       content,
-      contentHash: result.path,
+      contentHash: metadataHash,
       postType: type || "TEXT",
-      creatorAddress: author || req.walletAddress,
+      creatorAddress: author,
       status: "ACTIVE",
       bountyAmount: "0",
-      bountyToken: ethers.constants.AddressZero,
-      metadata,
+      bountyToken: ethers.ZeroAddress,
+      postId: postId, // You'll need to implement generateUniqueId
+      isAnonymous: isAnonymous || false,
+      timestamp: timestamp || Date.now(),
     });
 
     await post.save();
 
     res.json({
-      contentHash: result.path,
-      postId: post._id,
+      contentHash: metadataHash,
+      postId: post.postId,
       status: "success",
     });
   } catch (error) {
@@ -112,7 +104,7 @@ router.post("/", authMiddleware, upload.single("voice"), async (req, res) => {
  */
 router.post("/:postId/bounty", authMiddleware, async (req, res) => {
   try {
-    const { bountyAmount, bountyToken } = req.body;
+    const { bountyAmount, bountyToken, metadataHash } = req.body;
 
     // Validate input
     if (!bountyAmount || !ethers.utils.isAddress(bountyToken)) {
@@ -131,21 +123,6 @@ router.post("/:postId/bounty", authMiddleware, async (req, res) => {
       });
     }
 
-    // Create bounty metadata
-    const bountyMetadata = {
-      postId: req.params.postId,
-      bountyAmount: ethers.utils
-        .parseUnits(bountyAmount.toString(), "ether")
-        .toString(),
-      bountyToken,
-      creator: req.walletAddress,
-      timestamp: Date.now(),
-      status: "ACTIVE",
-    };
-
-    // Upload bounty metadata to IPFS
-    const result = await ipfs.add(JSON.stringify(bountyMetadata));
-
     // Update post with bounty information
     post.bountyAmount = bountyMetadata.bountyAmount;
     post.bountyToken = bountyToken;
@@ -155,7 +132,7 @@ router.post("/:postId/bounty", authMiddleware, async (req, res) => {
     await post.save();
 
     res.json({
-      contentHash: result.path,
+      contentHash: metadataHash,
       status: "success",
       bountyMetadata,
     });

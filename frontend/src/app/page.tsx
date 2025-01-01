@@ -8,7 +8,7 @@ import audio from "../images/audio-design.png";
 import ShufflingCards from "../components/ShufflingCards";
 import Navbar from "../components/Navbar";
 import VoiceEffect from "../components/VoiceEffect";
-import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import ConnectWalletSection from "@/components/ConnectWalletButton";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 
@@ -55,7 +55,7 @@ const App: React.FC = () => {
               className="h-20 w-48"
             />
           </header>
-          <ConnectWalletButton />
+          <ConnectWalletSection />
         </div>
 
         <button

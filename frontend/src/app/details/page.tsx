@@ -12,7 +12,7 @@ import Link from "next/link";
 import CommentAudioCard from "@/components/CommentAudioCard";
 import CommentTextCard from "@/components/CommentTextCard";
 import AudioPlayer from "@/components/AudioPlayer";
-import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import ConnectWalletSection from "@/components/ConnectWalletButton";
 
 function Details() {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -62,17 +62,18 @@ function Details() {
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
-         <div className="absolute flex justify-between w-full top-6">
-    <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
-     <Link href="/">
-          <Image src={logo} alt="logo" className="ml-10 h-16 w-16 rounded-full" />
-        </Link>
-     </div>
-     
-        <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-          <Image src={avatar} alt="avatar" className="h-12 w-12" />
-          <ConnectWalletButton />
+      <div className="absolute flex justify-between w-full top-6">
+        <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
+          <Link href="/">
+            <Image
+              src={logo}
+              alt="logo"
+              className="ml-10 h-16 w-16 rounded-full"
+            />
+          </Link>
         </div>
+
+        <ConnectWalletSection />
       </div>
       <div className="flex justify-center items-center">
         <Navbar />
@@ -192,8 +193,7 @@ function Details() {
         <CommentAudioCard audioUrl={audioUrl} />
         <CommentTextCard />
       </main>
-      </div>
-    
+    </div>
   );
 }
 

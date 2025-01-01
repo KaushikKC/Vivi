@@ -3,14 +3,13 @@
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
 import Image from "next/image";
-import avatar from "../../images/avatar.png";
 import logo from "../../images/vivi1.png";
 import Link from "next/link";
 import PendingBountyAudioCard from "../../components/PendingBountyAudioCard";
 import PendingBountyTextCard from "../../components/PendingBountyTextCard";
 import ClosedBountyAudioCard from "@/components/ClosedBountyAudioCard";
 import ClosedBountyTextCard from "@/components/ClosedBountyTextCard";
-import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import ConnectWalletSection from "@/components/ConnectWalletButton";
 
 const Bounty: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<"closed" | "pending">(
@@ -21,7 +20,6 @@ const Bounty: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
-      
       <div className="absolute flex justify-between w-full top-6">
         <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
           <Link href="/">
@@ -32,10 +30,7 @@ const Bounty: React.FC = () => {
             />
           </Link>
         </div>
-        <div className=" right-0 flex items-center justify-end space-x-3 mr-5">
-          <Image src={avatar} alt="avatar" className="h-12 w-12" />
-          <ConnectWalletButton />
-        </div>
+        <ConnectWalletSection />
       </div>
       <div className="flex justify-center items-center">
         <Navbar />
@@ -72,22 +67,19 @@ const Bounty: React.FC = () => {
           {/* Render cards conditionally based on active filter */}
           {activeFilter === "pending" && (
             <>
-              <PendingBountyAudioCard audioUrl={audioUrl}/>
+              <PendingBountyAudioCard audioUrl={audioUrl} />
               <PendingBountyTextCard />
             </>
           )}
           {activeFilter === "closed" && (
             <>
-              <ClosedBountyAudioCard audioUrl={audioUrl}/>
+              <ClosedBountyAudioCard audioUrl={audioUrl} />
               <ClosedBountyTextCard />
             </>
           )}
-          
         </div>
-        
       </main>
-     </div>
- 
+    </div>
   );
 };
 
