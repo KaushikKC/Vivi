@@ -10,9 +10,37 @@ import Navbar from "../components/Navbar";
 import VoiceEffect from "../components/VoiceEffect";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
 
 const App: React.FC = () => {
   const router = useRouter();
+  const account = useAccount();
+
+  const checkUserProfile = async (address: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3500/api/users/profile/${address}`
+      );
+      return response.ok; // Returns true if profile exists, false otherwise
+    } catch (error) {
+      console.error("Error checking user profile:", error);
+      return false;
+    }
+  };
+
+  const handleJoinConversation = async () => {
+    if (!account.address) {
+      console.error("Please connect your wallet first");
+      return;
+    }
+
+    const profileExists = await checkUserProfile(account.address);
+    if (profileExists) {
+      router.push("/post");
+    } else {
+      router.push("/profile-setup");
+    }
+  };
   return (
     // <LensAuthProvider>
     <div className="font-rajdhani">
@@ -22,16 +50,16 @@ const App: React.FC = () => {
             <Image
               src={header}
               alt="Header Logo"
-              width={180}
-              height={90}
-              className="h-30 w-60"
+              width={100}
+              height={50}
+              className="h-20 w-48"
             />
           </header>
           <ConnectWalletButton />
         </div>
 
         <button
-          onClick={() => router.push("/profile-setup")}
+          onClick={handleJoinConversation}
           className="flex items-center justify-center bg-black bg-opacity-40 font-semibold backdrop-blur-md px-4 text-[20px] rounded-full my-10"
         >
           <Image

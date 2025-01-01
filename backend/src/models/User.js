@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
   },
+  name: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
   ensName: {
     type: String,
     unique: true,

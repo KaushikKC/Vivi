@@ -5,13 +5,6 @@ const multer = require("multer");
 const { create } = require("ipfs-http-client");
 const User = require("../models/User");
 
-// IPFS client setup
-const ipfs = create({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-});
-
 // Multer setup for file uploads
 const upload = multer({
   limits: {
@@ -36,42 +29,30 @@ const verifySignature = async (req, res, next) => {
 };
 
 // Create or update user profile
-router.post(
-  "/profile",
-  verifySignature,
-  upload.single("profilePicture"),
-  async (req, res) => {
-    try {
-      const { ensName, bio } = req.body;
-      const walletAddress = req.walletAddress;
+router.post("/profile", upload.single("profilePicture"), async (req, res) => {
+  try {
+    const { ensName, bio, name, profilePictureHash, walletAddress } = req.body;
 
-      // Upload profile picture to IPFS if provided
-      let profilePictureHash = null;
-      if (req.file) {
-        const result = await ipfs.add(req.file.buffer);
-        profilePictureHash = result.path;
-      }
+    // Update or create user profile
+    const updateData = {
+      ensName,
+      name,
+      bio,
+      lastActive: new Date(),
+      ...(profilePictureHash && { profilePicture: profilePictureHash }),
+    };
 
-      // Update or create user profile
-      const updateData = {
-        ensName,
-        bio,
-        lastActive: new Date(),
-        ...(profilePictureHash && { profilePicture: profilePictureHash }),
-      };
+    const user = await User.findOneAndUpdate({ walletAddress }, updateData, {
+      new: true,
+      upsert: true,
+    });
 
-      const user = await User.findOneAndUpdate({ walletAddress }, updateData, {
-        new: true,
-        upsert: true,
-      });
-
-      res.json(user);
-    } catch (error) {
-      console.error("Profile update error:", error);
-      res.status(500).json({ error: "Failed to update profile" });
-    }
+    res.json(user);
+  } catch (error) {
+    console.error("Profile update error:", error);
+    res.status(500).json({ error: "Failed to update profile" });
   }
-);
+});
 
 // Get user profile
 router.get("/profile/:walletAddress", async (req, res) => {
