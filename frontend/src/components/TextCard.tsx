@@ -8,6 +8,10 @@ import { BiSolidCommentDetail } from "react-icons/bi";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import close from "../images/close.png";
 import Link from "next/link";
+import { useAccount, useWriteContract } from "wagmi";
+import axios from "axios";
+import { contractAddress } from "@/constants/contractAddress";
+import { abi } from "@/constants/abi";
 
 interface PostContent {
   text?: string;
@@ -31,6 +35,7 @@ interface UserData {
 }
 
 const TextCard: React.FC<TextCardProps> = ({
+  _id,
   content,
   timestamp,
   likes,
@@ -39,10 +44,20 @@ const TextCard: React.FC<TextCardProps> = ({
   postId,
   creatorAddress,
 }) => {
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [isDisliked, setIsDisliked] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserData>({ name: "Anonymous" });
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [likesCount, setLikesCount] = useState<number>(likes.length);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [dislikesCount, setDislikesCount] = useState<number>(dislikes.length);
+  const { address } = useAccount();
+  const [isLiked, setIsLiked] = useState<boolean>(
+    likes.includes(address || "")
+  );
+  const [isDisliked, setIsDisliked] = useState<boolean>(
+    dislikes.includes(address || "")
+  );
+  const { writeContract } = useWriteContract();
 
   // Convert timestamp to readable date
   const formatDate = (timestamp: number): string => {
@@ -81,27 +96,66 @@ const TextCard: React.FC<TextCardProps> = ({
     }
   }, [creatorAddress]);
 
-  const handleLike = (): void => {
-    if (isLiked) {
-      setIsLiked(false);
-    } else {
-      setIsLiked(true);
-      if (isDisliked) {
-        setIsDisliked(false);
+  useEffect(() => {
+    // Check if user has already liked/disliked
+    if (address) {
+      setIsLiked(likes.includes(address));
+      setIsDisliked(dislikes.includes(address));
+    }
+  }, [address, likes, dislikes]);
+
+  const handleReaction = async (type: "like" | "dislike") => {
+    if (!address) {
+      alert("Please connect your wallet");
+      return;
+    }
+
+    try {
+      if (type === "like") {
+        // Call smart contract
+        writeContract({
+          address: contractAddress,
+          abi: abi,
+          functionName: "likePost",
+          args: [BigInt(postId)],
+        });
       }
+
+      // Call backend API
+      const response = await axios.post(
+        `http://localhost:3500/api/comments/${_id}/reaction`,
+        {
+          type,
+          isPost: true,
+          creatorAddress: address,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${address}`, // Assuming authMiddleware expects address in header
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        setLikesCount(response.data.likes);
+        setDislikesCount(response.data.dislikes);
+
+        if (type === "like") {
+          setIsLiked(!isLiked);
+          if (isDisliked) setIsDisliked(false);
+        } else {
+          setIsDisliked(!isDisliked);
+          if (isLiked) setIsLiked(false);
+        }
+      }
+    } catch (error) {
+      console.error(`Error ${type}ing post:`, error);
+      alert(`Failed to ${type} post. Please try again.`);
     }
   };
 
-  const handleDislike = (): void => {
-    if (isDisliked) {
-      setIsDisliked(false);
-    } else {
-      setIsDisliked(true);
-      if (isLiked) {
-        setIsLiked(false);
-      }
-    }
-  };
+  const handleLike = () => handleReaction("like");
+  const handleDislike = () => handleReaction("dislike");
 
   return (
     <section className="bg-gray-800 p-5 rounded-lg mb-4 max-w-3xl">

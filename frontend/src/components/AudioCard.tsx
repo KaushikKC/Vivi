@@ -9,6 +9,10 @@ import { IoMdShare } from "react-icons/io";
 import close from "../images/close.png";
 import Link from "next/link";
 import AudioPlayer from "./AudioPlayer";
+import axios from "axios";
+import { contractAddress } from "@/constants/contractAddress";
+import { abi } from "@/constants/abi";
+import { useAccount, useWriteContract } from "wagmi";
 
 interface AudioCardProps {
   _id: string;
@@ -22,6 +26,7 @@ interface AudioCardProps {
 }
 
 const AudioCard: React.FC<AudioCardProps> = ({
+  _id,
   audioUrl,
   creatorAddress,
   timestamp,
@@ -30,15 +35,25 @@ const AudioCard: React.FC<AudioCardProps> = ({
   commentCount,
   postId,
 }) => {
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [isDisliked, setIsDisliked] = useState<boolean>(false);
   const [userData, setUserData] = useState<{
     name: string;
     profilePicture?: string;
   }>({
     name: "Anonymous",
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [likesCount, setLikesCount] = useState<number>(likes.length);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [dislikesCount, setDislikesCount] = useState<number>(dislikes.length);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { address } = useAccount();
+  const { writeContract } = useWriteContract();
+  const [isLiked, setIsLiked] = useState<boolean>(
+    likes.includes(address || "")
+  );
+  const [isDisliked, setIsDisliked] = useState<boolean>(
+    dislikes.includes(address || "")
+  );
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -65,6 +80,13 @@ const AudioCard: React.FC<AudioCardProps> = ({
     }
   }, [creatorAddress]);
 
+  useEffect(() => {
+    if (address) {
+      setIsLiked(likes.includes(address));
+      setIsDisliked(dislikes.includes(address));
+    }
+  }, [likes, dislikes, address]);
+
   const formatDate = (timestamp: number): string => {
     const date = new Date(timestamp);
     return date.toLocaleDateString("en-US", {
@@ -75,27 +97,58 @@ const AudioCard: React.FC<AudioCardProps> = ({
     });
   };
 
-  const handleLike = (): void => {
-    if (isLiked) {
-      setIsLiked(false);
-    } else {
-      setIsLiked(true);
-      if (isDisliked) {
-        setIsDisliked(false);
+  const handleReaction = async (type: "like" | "dislike") => {
+    if (!address) {
+      alert("Please connect your wallet");
+      return;
+    }
+
+    try {
+      if (type === "like") {
+        // Call smart contract
+        writeContract({
+          address: contractAddress,
+          abi: abi,
+          functionName: "likePost",
+          args: [BigInt(postId)],
+        });
       }
+
+      // Call backend API
+      const response = await axios.post(
+        `http://localhost:3500/api/comments/${_id}/reaction`,
+        {
+          type,
+          isPost: true,
+          creatorAddress: address,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${address}`,
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        setLikesCount(response.data.likes);
+        setDislikesCount(response.data.dislikes);
+
+        if (type === "like") {
+          setIsLiked(!isLiked);
+          if (isDisliked) setIsDisliked(false);
+        } else {
+          setIsDisliked(!isDisliked);
+          if (isLiked) setIsLiked(false);
+        }
+      }
+    } catch (error) {
+      console.error(`Error ${type}ing post:`, error);
+      alert(`Failed to ${type} post. Please try again.`);
     }
   };
 
-  const handleDislike = (): void => {
-    if (isDisliked) {
-      setIsDisliked(false);
-    } else {
-      setIsDisliked(true);
-      if (isLiked) {
-        setIsLiked(false);
-      }
-    }
-  };
+  const handleLike = () => handleReaction("like");
+  const handleDislike = () => handleReaction("dislike");
 
   return (
     <section className="bg-gray-800 p-5 rounded-lg mb-4">

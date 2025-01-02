@@ -3,8 +3,6 @@ const router = express.Router();
 const multer = require("multer");
 const Comment = require("../models/Comment");
 const Post = require("../models/Post");
-const ipfs = require("../config/ipfs");
-const authMiddleware = require("../middleware/auth");
 
 // Multer configuration for voice comments
 const storage = multer.memoryStorage();
@@ -153,11 +151,10 @@ router.get("/comments/:commentId/voice", async (req, res) => {
 });
 
 // Toggle like/dislike for post or comment (unchanged)
-router.post("/:id/reaction", authMiddleware, async (req, res) => {
+router.post("/:id/reaction", async (req, res) => {
   try {
-    const { type, isPost } = req.body;
+    const { type, isPost, creatorAddress } = req.body;
     const id = req.params.id;
-    const userAddress = req.walletAddress;
 
     const Model = isPost ? Post : Comment;
     const item = await Model.findById(id);
@@ -169,13 +166,15 @@ router.post("/:id/reaction", authMiddleware, async (req, res) => {
       });
     }
 
-    item.likes = item.likes.filter((address) => address !== userAddress);
-    item.dislikes = item.dislikes.filter((address) => address !== userAddress);
+    item.likes = item.likes.filter((address) => address !== creatorAddress);
+    item.dislikes = item.dislikes.filter(
+      (address) => address !== creatorAddress
+    );
 
     if (type === "like") {
-      item.likes.push(userAddress);
+      item.likes.push(creatorAddress);
     } else if (type === "dislike") {
-      item.dislikes.push(userAddress);
+      item.dislikes.push(creatorAddress);
     }
 
     await item.save();

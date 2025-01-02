@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const ethers = require("ethers");
 const multer = require("multer");
-const { create } = require("ipfs-http-client");
 const User = require("../models/User");
 
 // Multer setup for file uploads
@@ -11,22 +10,6 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB max file size
   },
 });
-
-// Middleware to verify wallet signature
-const verifySignature = async (req, res, next) => {
-  try {
-    const { signature, message, walletAddress } = req.headers;
-    const recoveredAddress = ethers.utils.verifyMessage(message, signature);
-
-    if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
-      return res.status(401).json({ error: "Invalid signature" });
-    }
-    req.walletAddress = walletAddress.toLowerCase();
-    next();
-  } catch (error) {
-    res.status(401).json({ error: "Authentication failed" });
-  }
-};
 
 // Create or update user profile
 router.post("/profile", upload.single("profilePicture"), async (req, res) => {

@@ -3,9 +3,6 @@ const router = express.Router();
 const multer = require("multer");
 const { ethers } = require("ethers");
 const Post = require("../models/Post");
-const ipfs = require("../config/ipfs");
-const authMiddleware = require("../middleware/auth");
-const VoiceProcessingService = require("../services/voiceProcessing");
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage();
@@ -102,7 +99,7 @@ router.post("/", upload.single("voice"), async (req, res) => {
  * @desc Add bounty to post
  * @access Private
  */
-router.post("/:postId/bounty", authMiddleware, async (req, res) => {
+router.post("/:postId/bounty", async (req, res) => {
   try {
     const { bountyAmount, bountyToken, metadataHash } = req.body;
 
@@ -188,7 +185,7 @@ router.get("/:postId", async (req, res) => {
  * @desc Update a post
  * @access Private
  */
-router.put("/:postId", authMiddleware, async (req, res) => {
+router.put("/:postId", async (req, res) => {
   try {
     const post = await Post.findOne({ postId: req.params.postId });
 
@@ -222,7 +219,7 @@ router.put("/:postId", authMiddleware, async (req, res) => {
  * @desc Delete a post
  * @access Private
  */
-router.delete("/:postId", authMiddleware, async (req, res) => {
+router.delete("/:postId", async (req, res) => {
   try {
     const post = await Post.findOne({ postId: req.params.postId });
 

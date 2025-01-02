@@ -1,7 +1,5 @@
 const express = require("express");
-const router = express.Router(); // Add this line
 const bountyRouter = express.Router();
-const authMiddleware = require("../middleware/auth");
 const Post = require("../models/Post"); // Add Post model import
 const ethers = require("ethers");
 
@@ -10,7 +8,7 @@ const ethers = require("ethers");
  * @desc Award a bounty to a user
  * @access Private
  */
-bountyRouter.post("/:postId/award", authMiddleware, async (req, res) => {
+bountyRouter.post("/:postId/award", async (req, res) => {
   try {
     const { postId } = req.params;
     const { recipientAddress } = req.body;
