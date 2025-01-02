@@ -2,10 +2,16 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
   {
-    postId: {
+    postRef: {
+      // MongoDB reference
       type: mongoose.Schema.Types.ObjectId,
       ref: "Post",
       required: true,
+    },
+    contractPostId: {
+      // Smart contract ID
+      type: Number,
+      required: true, // Add required if this is mandatory
     },
     contentHash: {
       type: String,
@@ -32,10 +38,6 @@ const commentSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
     },
-    metadata: {
-      type: Object,
-      required: true,
-    },
     likes: [
       {
         type: String, // wallet addresses
@@ -48,6 +50,10 @@ const commentSchema = new mongoose.Schema(
         lowercase: true,
       },
     ],
+    isAnonymous: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

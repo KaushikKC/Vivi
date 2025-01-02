@@ -1,15 +1,57 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import Image from "next/image";
 import { FaReplyAll, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 
-const CommentTextCard: React.FC = () => {
+interface CommentTextCardProps {
+  comment: {
+    _id: string;
+    content: string;
+    creatorAddress: string;
+    isAnonymous: boolean;
+    createdAt: string;
+    likes?: number;
+    dislikes?: number;
+  };
+}
+
+interface UserData {
+  name: string;
+  profilePicture?: string;
+}
+
+const CommentTextCard: React.FC<CommentTextCardProps> = ({ comment }) => {
   const [likes, setLikes] = useState<number>(0);
   const [dislikes, setDislikes] = useState<number>(0);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isDisliked, setIsDisliked] = useState<boolean>(false);
+  const [userData, setUserData] = useState<UserData>({ name: "Anonymous" });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (comment.isAnonymous) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3500/api/users/profile/${comment.creatorAddress}`
+        );
+        const data = await response.json();
+
+        if (data) {
+          setUserData({
+            name: data.name || "Anonymous",
+            profilePicture: data.profilePicture,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [comment.creatorAddress, comment.isAnonymous]);
 
   const handleLike = (): void => {
     if (isLiked) {
@@ -39,28 +81,43 @@ const CommentTextCard: React.FC = () => {
     }
   };
 
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4 max-w-3xl">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Image
-            src={avatar}
+            src={userData.profilePicture || avatar}
             alt="User Avatar"
+            width={40}
+            height={40}
             className="w-10 h-10 bg-gray-700 rounded-full"
           />
           <div>
-            <h3 className="text-[16px] font-semibold">Madhu Varsha</h3>
+            <h3 className="text-[16px] font-semibold">
+              {comment.isAnonymous
+                ? "Anonymous"
+                : `${comment.creatorAddress.slice(
+                    0,
+                    6
+                  )}...${comment.creatorAddress.slice(-4)}`}
+            </h3>
             <p className="text-sm text-gray-400">
-              Posted on Monday, 28 December 2024
+              Posted on {formatDate(comment.createdAt)}
             </p>
           </div>
         </div>
       </div>
       <div className="my-3">
-        <p className="text-[17px]">
-          Lorem ipsum is simply dummy text of the printing and typesetting
-          industry.
-        </p>
+        <p className="text-[17px]">{comment.content}</p>
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

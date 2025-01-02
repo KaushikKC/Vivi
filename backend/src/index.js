@@ -23,6 +23,7 @@ app.use(limiter);
 app.use("/api/posts", require("./routes/posts"));
 app.use("/api/bounties", require("./routes/bounties"));
 app.use("/api/users", require("./routes/user"));
+app.use("/api/comments", require("./routes/comments"));
 
 // Error handling
 app.use((err, req, res, next) => {

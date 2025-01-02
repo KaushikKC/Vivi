@@ -158,7 +158,7 @@ const Dashboard: React.FC = () => {
         console.log("post", response);
         if (response.status) {
           console.log("post", response);
-          setPosts(response.data.posts);
+          setPosts(response.data.data);
         }
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -469,9 +469,8 @@ const Dashboard: React.FC = () => {
         </section>
 
         {/* Posts */}
-        {/* Posts */}
         <div className="space-y-4">
-          {posts.map((post) => {
+          {posts?.map((post) => {
             if (post.postType === "TEXT") {
               return (
                 <TextCard
@@ -539,8 +538,6 @@ const Dashboard: React.FC = () => {
             return null;
           })}
         </div>
-        {/* <AudioCard audioUrl={audioUrl} />
-        <TextCard /> */}
       </main>
     </div>
   );

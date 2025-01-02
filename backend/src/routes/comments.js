@@ -9,118 +9,112 @@ const authMiddleware = require("../middleware/auth");
 // Multer configuration for voice comments
 const storage = multer.memoryStorage();
 const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+    files: 1,
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only audio files
+    if (file.mimetype.startsWith("audio/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only audio files are allowed!"), false);
+    }
+  },
 });
 
 // Create comment (supports both text and voice)
-router.post(
-  "/:postId/comments",
-  authMiddleware,
-  upload.single("voice"),
-  async (req, res) => {
-    try {
-      const { type, content: textContent } = req.body;
-      const postId = req.params.postId;
-      let content = {};
+router.post("/:postId/comments", upload.single("voice"), async (req, res) => {
+  try {
+    const {
+      type,
+      content: textContent,
+      creatorAddress,
+      isAnonymous,
+      metadataHash,
+      contractPostId,
+    } = req.body;
+    const postRef = req.params.postId;
+    let content = {};
 
-      // Validate post exists
-      const post = await Post.findById(postId);
-      if (!post) {
-        return res.status(404).json({
-          status: "error",
-          message: "Post not found",
-        });
-      }
-
-      // Handle TEXT comments
-      if (type === "TEXT") {
-        if (!textContent) {
-          return res.status(400).json({
-            status: "error",
-            message: "Content is required for text comments",
-          });
-        }
-        content.text = textContent;
-      }
-      // Handle VOICE comments
-      else if (type === "VOICE") {
-        if (!req.file) {
-          return res.status(400).json({
-            status: "error",
-            message: "Voice file is required for voice comments",
-          });
-        }
-        content.voice = {
-          data: req.file.buffer,
-          contentType: req.file.mimetype,
-          fileName: req.file.originalname,
-          fileSize: req.file.size,
-        };
-      } else {
-        return res.status(400).json({
-          status: "error",
-          message: "Invalid comment type",
-        });
-      }
-
-      // Create metadata
-      const metadata = {
-        type: type || "TEXT",
-        author: req.walletAddress,
-        timestamp: Date.now(),
-        ...(type === "VOICE" && {
-          fileName: content.voice?.fileName,
-          fileSize: content.voice?.fileSize,
-          contentType: content.voice?.contentType,
-        }),
-      };
-
-      // Prepare IPFS content
-      const ipfsContent = {
-        content: type === "TEXT" ? content.text : undefined,
-        metadata,
-      };
-
-      // Upload to IPFS
-      const result = await ipfs.add(JSON.stringify(ipfsContent));
-
-      // Create comment
-      const comment = new Comment({
-        postId,
-        content,
-        contentHash: result.path,
-        commentType: type,
-        creatorAddress: req.walletAddress,
-        metadata,
-        likes: [],
-        dislikes: [],
-      });
-
-      await comment.save();
-
-      // Update post comment count
-      await Post.findByIdAndUpdate(postId, { $inc: { commentCount: 1 } });
-
-      res.json({
-        contentHash: result.path,
-        commentId: comment._id,
-        status: "success",
-      });
-    } catch (error) {
-      console.error("Comment creation error:", error);
-      res.status(500).json({
+    // Validate post exists
+    const post = await Post.findById(postRef);
+    if (!post) {
+      return res.status(404).json({
         status: "error",
-        message: error.message,
+        message: "Post not found",
       });
     }
+
+    // Handle TEXT comments
+    if (type === "TEXT") {
+      if (!textContent) {
+        return res.status(400).json({
+          status: "error",
+          message: "Content is required for text comments",
+        });
+      }
+      content.text = textContent;
+    }
+    // Handle VOICE comments
+    else if (type === "VOICE") {
+      if (!req.file) {
+        return res.status(400).json({
+          status: "error",
+          message: "Voice file is required for voice comments",
+        });
+      }
+      content.voice = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+        fileName: req.file.originalname,
+        fileSize: req.file.size,
+      };
+    } else {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid comment type",
+      });
+    }
+
+    // Create comment
+    const comment = new Comment({
+      postRef, // MongoDB reference
+      contractPostId,
+      content,
+      contentHash: metadataHash,
+      commentType: type,
+      creatorAddress,
+      isAnonymous: isAnonymous || false,
+      likes: [],
+      dislikes: [],
+    });
+
+    await comment.save();
+
+    await Post.findByIdAndUpdate(postRef, { $inc: { commentCount: 1 } });
+
+    res.json({
+      contentHash: metadataHash,
+      commentId: comment._id,
+      status: "success",
+    });
+  } catch (error) {
+    console.error("Comment creation error:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
   }
-);
+});
 
 // Get comments for a post
 router.get("/:postId/comments", async (req, res) => {
   try {
-    const comments = await Comment.find({ postId: req.params.postId }).sort({
+    const comments = await Comment.find({
+      contractPostId: req.params.postId,
+    }).sort({
       createdAt: -1,
     });
 

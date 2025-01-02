@@ -9,7 +9,13 @@ const AudioPlayer = ({ audioUrl }: AudioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load(); // Reload audio when URL changes
+    }
+  }, [audioUrl]);
 
   useEffect(() => {
     // Initialize audio element on client side only
