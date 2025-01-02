@@ -82,7 +82,7 @@ const ProfileSetup: React.FC = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:3500/api/users/profile",
+        "https://vivi-backend.vercel.app/api/users/profile",
         formDataToSend,
         {
           headers: {

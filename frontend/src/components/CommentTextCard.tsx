@@ -35,7 +35,7 @@ const CommentTextCard: React.FC<CommentTextCardProps> = ({ comment }) => {
 
       try {
         const response = await fetch(
-          `http://localhost:3500/api/users/profile/${comment.creatorAddress}`
+          `https://vivi-backend.vercel.app/api/users/profile/${comment.creatorAddress}`
         );
         const data = await response.json();
 

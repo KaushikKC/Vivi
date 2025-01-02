@@ -74,7 +74,7 @@ const TextCard: React.FC<TextCardProps> = ({
     const fetchUserData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3500/api/users/profile/${creatorAddress}`
+          `https://vivi-backend.vercel.app/api/users/profile/${creatorAddress}`
         );
         const data = await response.json();
 
@@ -123,7 +123,7 @@ const TextCard: React.FC<TextCardProps> = ({
 
       // Call backend API
       const response = await axios.post(
-        `http://localhost:3500/api/comments/${_id}/reaction`,
+        `https://vivi-backend.vercel.app/api/comments/${_id}/reaction`,
         {
           type,
           isPost: true,

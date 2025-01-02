@@ -63,7 +63,7 @@ interface UserData {
 
 // API request configuration
 const API_CONFIG = {
-  baseURL: "http://localhost:3500/api",
+  baseURL: "https://vivi-backend.vercel.app/api",
   retryDelay: 1000,
   maxRetries: 3,
 };
@@ -325,7 +325,7 @@ function Details() {
           onSuccess: async () => {
             try {
               const apiResponse = await fetch(
-                `http://localhost:3500/api/comments/${post?._id}/comments`,
+                `https://vivi-backend.vercel.app/api/comments/${post?._id}/comments`,
                 {
                   method: "POST",
                   body: formData,

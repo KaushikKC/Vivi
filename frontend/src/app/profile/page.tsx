@@ -26,7 +26,7 @@ const Profile: React.FC = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:3500/api/users/profile/${address}`
+          `https://vivi-backend.vercel.app/api/users/profile/${address}`
         );
         if (response.ok) {
           const userData = await response.json();

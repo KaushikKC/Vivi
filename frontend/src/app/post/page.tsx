@@ -132,7 +132,7 @@ const Dashboard: React.FC = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:3500/api/users/profile/${address}`
+          `https://vivi-backend.vercel.app/api/users/profile/${address}`
         );
         if (response.ok) {
           const userData = await response.json();
@@ -154,7 +154,9 @@ const Dashboard: React.FC = () => {
     console.log("hi conloging the post");
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("http://localhost:3500/api/posts");
+        const response = await axios.get(
+          "https://vivi-backend.vercel.app/api/posts"
+        );
         console.log("post", response);
         if (response.status) {
           console.log("post", response);
@@ -267,7 +269,7 @@ const Dashboard: React.FC = () => {
           onSuccess: async () => {
             try {
               const apiResponse = await axios.post(
-                "http://localhost:3500/api/posts",
+                "https://vivi-backend.vercel.app/api/posts",
                 formData,
                 {
                   headers: {
