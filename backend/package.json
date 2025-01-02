@@ -24,8 +24,6 @@
     "mongoose": "^8.9.2",
     "multer": "^1.4.5-lts.1",
     "node-wav": "^0.0.2",
-    "openai": "^4.77.0",
-    "vosk": "^0.3.39",
-    "web-audio-api": "^0.2.2"
+    "openai": "^4.77.0"
   }
 }
