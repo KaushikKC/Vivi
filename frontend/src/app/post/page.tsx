@@ -19,6 +19,38 @@ import { parseEther } from "viem";
 import { contractAddress } from "@/constants/contractAddress";
 import { abi } from "@/constants/abi";
 
+interface VoiceData {
+  data: string | Buffer;
+  contentType: string;
+  fileName: string;
+  fileSize: number;
+}
+
+interface PostContent {
+  text?: string;
+  image?: string;
+  voice?: VoiceData;
+}
+
+interface Post {
+  _id: string;
+  contentHash: string;
+  postId: number;
+  postType: "TEXT" | "VOICE";
+  content: PostContent;
+  creatorAddress: string;
+  status: string;
+  bountyAmount: string;
+  bountyToken: string;
+  likes: string[];
+  dislikes: string[];
+  commentCount: number;
+  isAnonymous: boolean;
+  timestamp: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const Dashboard: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -42,7 +74,7 @@ const Dashboard: React.FC = () => {
     abi: abi,
     functionName: "postCount",
   });
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   const { writeContract } = useWriteContract();
 
@@ -446,7 +478,7 @@ const Dashboard: React.FC = () => {
                   key={post._id}
                   _id={post._id}
                   content={{
-                    text: post.content.text || post.content, // Handle both object and string content
+                    text: post.content.text, // Handle both object and string content
                     image: post.content.image || undefined,
                   }}
                   creatorAddress={post.creatorAddress}
