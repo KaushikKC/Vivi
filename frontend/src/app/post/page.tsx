@@ -42,6 +42,7 @@ const Dashboard: React.FC = () => {
     abi: abi,
     functionName: "postCount",
   });
+  const [posts, setPosts] = useState<any[]>([]);
 
   const { writeContract } = useWriteContract();
 
@@ -116,6 +117,24 @@ const Dashboard: React.FC = () => {
 
     fetchUserProfile();
   }, [address]);
+
+  useEffect(() => {
+    console.log("hi conloging the post");
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get("http://localhost:3500/api/posts");
+        console.log("post", response);
+        if (response.status) {
+          console.log("post", response);
+          setPosts(response.data.posts);
+        }
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const uploadToIPFS = async (file: File | Blob | string) => {
     try {
@@ -418,8 +437,78 @@ const Dashboard: React.FC = () => {
         </section>
 
         {/* Posts */}
-        <AudioCard audioUrl={audioUrl} />
-        <TextCard />
+        {/* Posts */}
+        <div className="space-y-4">
+          {posts.map((post) => {
+            if (post.postType === "TEXT") {
+              return (
+                <TextCard
+                  key={post._id}
+                  _id={post._id}
+                  content={{
+                    text: post.content.text || post.content, // Handle both object and string content
+                    image: post.content.image || undefined,
+                  }}
+                  creatorAddress={post.creatorAddress}
+                  timestamp={post.timestamp}
+                  likes={post.likes}
+                  dislikes={post.dislikes}
+                  commentCount={post.commentCount}
+                  postId={post.postId}
+                />
+              );
+            } else if (post.postType === "VOICE") {
+              let newaudioUrl;
+              try {
+                if (post.content?.voice?.data) {
+                  // Check if the data is already a string or needs conversion
+                  const base64String =
+                    typeof post.content.voice.data === "object"
+                      ? Buffer.from(post.content.voice.data).toString("base64")
+                      : post.content.voice.data;
+
+                  // Create blob from base64
+                  const byteCharacters = Buffer.from(
+                    base64String,
+                    "base64"
+                  ).toString("binary");
+                  const byteNumbers = new Array(byteCharacters.length);
+
+                  for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                  }
+
+                  const byteArray = new Uint8Array(byteNumbers);
+                  const blob = new Blob([byteArray], { type: "audio/wav" });
+                  newaudioUrl = URL.createObjectURL(blob);
+                } else if (post.contentHash) {
+                  // If there's a content hash (IPFS URL), use that instead
+                  newaudioUrl = post.contentHash;
+                }
+              } catch (error) {
+                console.error("Error converting audio data:", error);
+                // Use contentHash as fallback if conversion fails
+                newaudioUrl = post.contentHash;
+              }
+              return (
+                <AudioCard
+                  key={post._id}
+                  _id={post._id}
+                  audioUrl={newaudioUrl}
+                  creatorAddress={post.creatorAddress}
+                  timestamp={post.timestamp}
+                  likes={post.likes}
+                  dislikes={post.dislikes}
+                  commentCount={post.commentCount}
+                  postId={post.postId}
+                />
+              );
+            }
+            return null;
+          })}
+        </div>
+        {/* <AudioCard audioUrl={audioUrl} />
+        <TextCard /> */}
       </main>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { BiSolidCommentDetail } from "react-icons/bi";
@@ -11,40 +11,89 @@ import Link from "next/link";
 import AudioPlayer from "./AudioPlayer";
 
 interface AudioCardProps {
-  audioUrl: string;
+  _id: string;
+  audioUrl: string | undefined;
+  creatorAddress: string;
+  timestamp: number;
+  likes: string[];
+  dislikes: string[];
+  commentCount: number;
+  postId: number;
 }
 
-function AudioCard({ audioUrl }: AudioCardProps) {
-  const [likes, setLikes] = useState<number>(0);
-  const [dislikes, setDislikes] = useState<number>(0);
+const AudioCard: React.FC<AudioCardProps> = ({
+  audioUrl,
+  creatorAddress,
+  timestamp,
+  likes,
+  dislikes,
+  commentCount,
+  postId,
+}) => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isDisliked, setIsDisliked] = useState<boolean>(false);
+  const [userData, setUserData] = useState<{
+    name: string;
+    profilePicture?: string;
+  }>({
+    name: "Anonymous",
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3500/api/users/profile/${creatorAddress}`
+        );
+        const data = await response.json();
+        if (data) {
+          setUserData({
+            name: data.name || "Anonymous",
+            profilePicture: data.profilePicture,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (creatorAddress) {
+      fetchUserData();
+    }
+  }, [creatorAddress]);
+
+  const formatDate = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   const handleLike = (): void => {
     if (isLiked) {
-      setLikes(likes - 1);
       setIsLiked(false);
     } else {
-      setLikes(likes + 1);
+      setIsLiked(true);
       if (isDisliked) {
-        setDislikes(dislikes - 1);
         setIsDisliked(false);
       }
-      setIsLiked(true);
     }
   };
 
   const handleDislike = (): void => {
     if (isDisliked) {
-      setDislikes(dislikes - 1);
       setIsDisliked(false);
     } else {
-      setDislikes(dislikes + 1);
+      setIsDisliked(true);
       if (isLiked) {
-        setLikes(likes - 1);
         setIsLiked(false);
       }
-      setIsDisliked(true);
     }
   };
 
@@ -53,14 +102,18 @@ function AudioCard({ audioUrl }: AudioCardProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Image
-            src={avatar}
+            src={userData.profilePicture || avatar}
             alt="User avatar"
-            className="w-10 h-10 bg-gray-700 rounded-full"
+            width={40}
+            height={40}
+            className="w-10 h-10 bg-gray-700 rounded-full object-cover"
           />
           <div>
-            <h3 className="text-[16px] font-semibold">Madhu Varsha</h3>
+            <h3 className="text-[16px] font-semibold">
+              {isLoading ? "Loading..." : userData.name}
+            </h3>
             <p className="text-sm text-gray-400">
-              Posted on Monday, 28 December 2024
+              Posted on {formatDate(timestamp)}
             </p>
           </div>
         </div>
@@ -77,7 +130,7 @@ function AudioCard({ audioUrl }: AudioCardProps) {
                 isLiked ? "text-blue-500" : "text-gray-400"
               }`}
             />
-            <span className="text-white">{likes}</span>
+            <span className="text-white">{likes.length}</span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
@@ -85,14 +138,15 @@ function AudioCard({ audioUrl }: AudioCardProps) {
                 isDisliked ? "text-red-500" : "text-gray-400"
               }`}
             />
-            <span className="text-white">{dislikes}</span>
+            <span className="text-white">{dislikes.length}</span>
           </button>
-          <Link href="/details">
+          <div className="flex items-center gap-1">
             <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
-          </Link>
+            <span className="text-white">{commentCount}</span>
+          </div>
           <IoMdShare className="h-5 w-5 text-gray-400" />
         </div>
-        <Link href="/details">
+        <Link href={`/details/${postId}`}>
           <button className="text-[16px] border border-[#7482F1] bg-transparent py-1 px-3 rounded-xl h-fit transition duration-200">
             Know more
           </button>
@@ -100,6 +154,6 @@ function AudioCard({ audioUrl }: AudioCardProps) {
       </div>
     </section>
   );
-}
+};
 
 export default AudioCard;

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaPause, FaPlay } from "react-icons/fa";
 
 type AudioPlayerProps = {
-  audioUrl: string;
+  audioUrl: string | undefined;
 };
 
 const AudioPlayer = ({ audioUrl }: AudioPlayerProps) => {

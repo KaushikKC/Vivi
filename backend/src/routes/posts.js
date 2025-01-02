@@ -152,52 +152,17 @@ router.post("/:postId/bounty", authMiddleware, async (req, res) => {
  */
 router.get("/", async (req, res) => {
   try {
-    const {
-      tag,
-      hasBounty,
-      creatorAddress,
-      isAnonymous,
-      status,
-      page = 1,
-      limit = 10,
-      sortBy = "createdAt",
-      sortOrder = "desc",
-    } = req.query;
+    const posts = await Post.find().sort({ createdAt: -1 }); // Optional: keeps posts sorted by newest first
 
-    // Build query
-    let query = {};
-    if (tag) query.tags = tag;
-    if (hasBounty === "true") query.bountyAmount = { $gt: 0 };
-    if (creatorAddress) query.creatorAddress = creatorAddress;
-    if (isAnonymous) query.isAnonymous = isAnonymous === "true";
-    if (status) query.status = status;
-
-    // Build sort
-    const sortOptions = {};
-    sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
-
-    // Execute query with pagination
-    const posts = await Post.find(query)
-      .sort(sortOptions)
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit))
-      .select("-__v");
-
-    // Get total count for pagination
-    const total = await Post.countDocuments(query);
-
-    res.json({
-      posts,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / limit),
-        totalPosts: total,
-        hasMore: page * limit < total,
-      },
+    res.status(200).json({
+      success: true,
+      data: posts,
     });
   } catch (error) {
-    console.error("Get posts error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
 

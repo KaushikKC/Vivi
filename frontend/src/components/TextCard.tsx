@@ -1,46 +1,105 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import Image from "next/image";
 import { IoMdShare } from "react-icons/io";
 import { BiSolidCommentDetail } from "react-icons/bi";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
-import example from "../images/example.png";
 import close from "../images/close.png";
 import Link from "next/link";
 
-const TextCard: React.FC = () => {
-  const [likes, setLikes] = useState<number>(0);
-  const [dislikes, setDislikes] = useState<number>(0);
+interface PostContent {
+  text?: string;
+  image?: string;
+}
+
+interface TextCardProps {
+  _id: string;
+  content: PostContent;
+  creatorAddress: string;
+  timestamp: number;
+  likes: string[];
+  dislikes: string[];
+  commentCount: number;
+  postId: number;
+}
+
+interface UserData {
+  name: string;
+  profilePicture?: string;
+}
+
+const TextCard: React.FC<TextCardProps> = ({
+  content,
+  timestamp,
+  likes,
+  dislikes,
+  commentCount,
+  postId,
+  creatorAddress,
+}) => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isDisliked, setIsDisliked] = useState<boolean>(false);
+  const [userData, setUserData] = useState<UserData>({ name: "Anonymous" });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Convert timestamp to readable date
+  const formatDate = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3500/api/users/profile/${creatorAddress}`
+        );
+        const data = await response.json();
+
+        if (data) {
+          setUserData({
+            name: data.name || "Anonymous",
+            profilePicture: data.profilePicture,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (creatorAddress) {
+      fetchUserData();
+    }
+  }, [creatorAddress]);
 
   const handleLike = (): void => {
     if (isLiked) {
-      setLikes(likes - 1);
       setIsLiked(false);
     } else {
-      setLikes(likes + 1);
+      setIsLiked(true);
       if (isDisliked) {
-        setDislikes(dislikes - 1);
         setIsDisliked(false);
       }
-      setIsLiked(true);
     }
   };
 
   const handleDislike = (): void => {
     if (isDisliked) {
-      setDislikes(dislikes - 1);
       setIsDisliked(false);
     } else {
-      setDislikes(dislikes + 1);
+      setIsDisliked(true);
       if (isLiked) {
-        setLikes(likes - 1);
         setIsLiked(false);
       }
-      setIsDisliked(true);
     }
   };
 
@@ -49,59 +108,60 @@ const TextCard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Image
-            src={avatar}
+            src={userData.profilePicture || avatar}
             alt="User Avatar"
-            className="w-10 h-10 bg-gray-700 rounded-full"
+            width={40}
+            height={40}
+            className="w-10 h-10 bg-gray-700 rounded-full object-cover"
           />
           <div>
-            <h3 className="text-[16px] font-semibold">Madhu Varsha</h3>
+            <h3 className="text-[16px] font-semibold">
+              {isLoading ? "Loading..." : userData.name}
+            </h3>
             <p className="text-sm text-gray-400">
-              Posted on Monday, 28 December 2024
+              Posted on {formatDate(timestamp)}
             </p>
           </div>
         </div>
         <Image src={close} alt="Close Icon" className="h-5 w-5" />
       </div>
       <div className="my-3">
-        <p className="text-[17px]">
-          Lorem ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem ipsum has been the industry&apos;s standard dummy text
-          ever since the 1500s. Lorem ipsum is simply dummy text of the printing
-          and typesetting industry. Lorem ipsum has been the industry&apos;s
-          standard dummy text ever since the 1500s.
-        </p>
-        <Image
-          src={example}
-          alt="Example Content"
-          className="mt-3 w-full rounded-md"
-        />
+        {content.text && <p className="text-[17px]">{content.text}</p>}
+        {content.image && (
+          <Image
+            src={content.image}
+            alt="Post Content"
+            className="mt-3 w-full rounded-md"
+            width={500}
+            height={300}
+          />
+        )}
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button onClick={handleLike} className="flex items-center gap-1">
             <FaThumbsUp
-              className={`h-5 w-5 ${isLiked
-                ? "text-blue-500"
-                : "text-gray-400"}`}
+              className={`h-5 w-5 ${
+                isLiked ? "text-blue-500" : "text-gray-400"
+              }`}
             />
-            <span className="text-white">
-              {likes}
-            </span>
+            <span className="text-white">{likes.length}</span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
-              className={`h-5 w-5 ${isDisliked
-                ? "text-red-500"
-                : "text-gray-400"}`}
+              className={`h-5 w-5 ${
+                isDisliked ? "text-red-500" : "text-gray-400"
+              }`}
             />
-            <span className="text-white">
-              {dislikes}
-            </span>
+            <span className="text-white">{dislikes.length}</span>
           </button>
-          <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
+          <div className="flex items-center gap-1">
+            <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
+            <span className="text-white">{commentCount}</span>
+          </div>
           <IoMdShare className="h-5 w-5 text-gray-400" />
         </div>
-        <Link href="/details">
+        <Link href={`/details/${postId}`}>
           <button className="text-[16px] border border-[#7482F1] bg-transparent py-1 px-3 rounded-xl h-fit transition duration-200">
             Know more
           </button>
