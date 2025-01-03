@@ -78,6 +78,14 @@ const postSchema = new mongoose.Schema(
       enum: ["NONE", "OPEN", "CLOSED"],
       default: "NONE",
     },
+    bountyPaidTo: {
+      type: String,
+      default: null,
+    },
+    bountyPaidAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

@@ -2,6 +2,11 @@
 
 import React, { useState } from "react";
 import AudioPlayer from "./AudioPlayer";
+import { contractAddress } from "@/constants/contractAddress";
+import { abi } from "@/constants/abi";
+import { parseEther } from "viem";
+import { useAccount, useWriteContract } from "wagmi";
+import axios from "axios";
 
 interface ViewAudioCardProps {
   audioUrl: string | undefined;
@@ -9,13 +14,73 @@ interface ViewAudioCardProps {
   postId: number;
   id: string;
 }
-function ViewAudioCard({ audioUrl, timestamp, id }: ViewAudioCardProps) {
+function ViewAudioCard({
+  audioUrl,
+  timestamp,
+  id,
+  postId,
+}: ViewAudioCardProps) {
   const [showBountyModal, setShowBountyModal] = useState(false);
   const [bountyAmount, setBountyAmount] = useState("0.005");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { address } = useAccount();
+  const { writeContract } = useWriteContract();
 
-  const handleAddBounty = () => {
-    // Add your bounty logic here
-    setShowBountyModal(false);
+  const handleAddBounty = async () => {
+    if (!address) {
+      alert("Please connect your wallet first");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      // Call smart contract
+      writeContract(
+        {
+          address: contractAddress, // Make sure to define this
+          abi: abi, // Make sure to import this
+          functionName: "addBountyToPost",
+          args: [postId],
+          value: parseEther(bountyAmount), // Convert ETH amount to Wei
+        },
+        {
+          onSuccess: async () => {
+            try {
+              // Call backend API
+              const apiResponse = await axios.post(
+                `https://vivi-backend.vercel.app/api/posts/${id}/bounty`,
+                parseEther(bountyAmount),
+                {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                }
+              );
+
+              if (apiResponse.data.success) {
+                // Reset and close modal
+                setBountyAmount("0.005");
+                setShowBountyModal(false);
+                // You might want to add a success notification here
+              }
+            } catch (error) {
+              console.error("Error saving bounty to backend:", error);
+              alert("Failed to save bounty to backend");
+            }
+          },
+          onError: (error) => {
+            console.error("Transaction failed:", error);
+            alert("Transaction failed");
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error adding bounty:", error);
+      alert("Failed to add bounty");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const formatDate = (timestamp: number): string => {

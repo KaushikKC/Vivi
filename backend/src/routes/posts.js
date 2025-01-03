@@ -183,6 +183,58 @@ router.put("/:postId/bounty-status", async (req, res) => {
 });
 
 /**
+ * @route POST /api/posts/:postId/pay-bounty
+ * @desc Pay bounty to user and close the bounty
+ * @access Private
+ */
+router.post("/:postId/pay-bounty", async (req, res) => {
+  try {
+    const { recipientAddress } = req.body;
+
+    // Find post in database
+    const post = await Post.findOne({ postId: req.params.postId });
+    if (!post) {
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found",
+      });
+    }
+
+    // Check if post has an active bounty
+    if (!post.hasBounty || post.bountyStatus !== "OPEN") {
+      return res.status(400).json({
+        status: "error",
+        message: "Post does not have an active bounty",
+      });
+    }
+
+    // Update post with bounty payment information
+    post.bountyStatus = "CLOSED";
+    post.bountyPaidTo = recipientAddress;
+    post.bountyPaidAt = Date.now();
+
+    await post.save();
+
+    res.json({
+      status: "success",
+      message: "Bounty paid successfully",
+      data: {
+        postId: post.postId,
+        recipientAddress: post.bountyPaidTo,
+        bountyAmount: post.bountyAmount,
+        paidAt: post.bountyPaidAt,
+      },
+    });
+  } catch (error) {
+    console.error("Bounty payment error:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+/**
  * @route GET /api/posts
  * @desc Get posts with filtering and pagination
  * @access Public

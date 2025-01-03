@@ -252,6 +252,7 @@ const Profile: React.FC = () => {
                     audioUrl={newaudioUrl}
                     timestamp={post.timestamp}
                     postId={post.postId}
+                    id={post._id}
                   />
                 );
               } catch (error) {
@@ -262,6 +263,7 @@ const Profile: React.FC = () => {
                     audioUrl={post.contentHash}
                     timestamp={post.timestamp}
                     postId={post.postId}
+                    id={post._id}
                   />
                 );
               }

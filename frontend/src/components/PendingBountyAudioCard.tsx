@@ -1,17 +1,49 @@
 "use client";
 
-import Image from "next/image";
-import React, { useState } from "react";
-import avatar from "../images/avatar.png";
+import React, { useEffect, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
 import AwardPopup from "./AwardPopup"; // Import the AwardPopup component
 
 interface BountyAudioCardProps {
   audioUrl: string;
+  timestamp: number;
+  postId: number;
+  bountyAmount: string;
+  expiryDate?: string;
+  responseCount?: number;
+  creatorAddress?: string;
+  creatorName?: string;
 }
 
-function PendingBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
+interface Comment {
+  _id: string;
+  commentType: "TEXT" | "VOICE";
+  content?: {
+    text?: string;
+    voice?: {
+      data: string | Buffer;
+      contentType: string;
+    };
+  };
+  contentHash?: string;
+  creatorAddress: string;
+  isAnonymous: boolean;
+  createdAt: string;
+  likes?: number;
+  dislikes?: number;
+}
+
+function PendingBountyAudioCard({
+  audioUrl,
+  timestamp,
+  postId,
+  bountyAmount, // Default value
+  responseCount = 0,
+}: BountyAudioCardProps) {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [comments, setComments] = useState<Comment>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle reward payment
   const handlePayReward = (selectedUser: string) => {
@@ -19,25 +51,50 @@ function PendingBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
     // Implement logic for paying the reward to the selected user.
   };
 
+  const formatTimestamp = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  // Fetch comments when popup is opened
+  useEffect(() => {
+    const fetchComments = async () => {
+      // if (isPopupVisible) {
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `https://vivi-backend.vercel.app/api/comments/${postId}/comments`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch comments");
+        }
+        const data = await response.json();
+        setComments(data.comments);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      } finally {
+        setIsLoading(false);
+      }
+      // }
+    };
+
+    fetchComments();
+  }, [isPopupVisible, postId]);
+
   // Toggle popup visibility
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
 
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image
-            src={avatar}
-            alt=""
-            className="w-10 h-10 bg-gray-700 rounded-full"
-          />
-          <div>
-            <h3 className="text-[16px] font-semibold">Madhu Varsha</h3>
-            <p className="text-sm text-gray-400">
-              Posted on Monday, 28 December 2024
-            </p>
-          </div>
-        </div>
+        <p className="text-sm text-gray-400">
+          Posted on {formatTimestamp(timestamp)}
+        </p>
       </div>
       <div className="my-3 flex justify-center w-fit">
         <div className="w-fit bg-gray-700/50 rounded-lg p-2">
@@ -47,17 +104,12 @@ function PendingBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
       <div className="flex space-x-4">
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
-            Amount: <span className="font-semibold">0.05 ETH</span>
+            Amount: <span className="font-semibold">{bountyAmount} ETH</span>
           </p>
         </div>
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
-            Expires in: <span className="font-semibold">2 days</span>
-          </p>
-        </div>
-        <div className="bg-gray-600 w-fit px-3 rounded-xl ">
-          <p className="text-white">
-            Responses: <span className="font-semibold">20</span>
+            Responses: <span className="font-semibold">{responseCount}</span>
           </p>
         </div>
       </div>
@@ -76,7 +128,9 @@ function PendingBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
         onClose={togglePopup}
         onPayReward={handlePayReward}
         bountyAmount="0.05 ETH"
-        totalResponses={20}
+        totalResponses={responseCount}
+        comments={comments}
+        postId={postId}
       />
     </section>
   );

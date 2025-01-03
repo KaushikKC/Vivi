@@ -7,25 +7,44 @@ import AudioPlayer from "./AudioPlayer";
 
 interface BountyAudioCardProps {
   audioUrl: string;
+  timestamp: number;
+  postId: number;
+  bountyAmount: string;
+  expiryDate?: string;
+  responseCount?: number;
+  creatorAddress?: string;
+  creatorName?: string;
+  rewardedAddress: string;
 }
 
-function ClosedBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
+function ClosedBountyAudioCard({
+  audioUrl,
+  timestamp,
+  bountyAmount, // Default value
+  responseCount = 0,
+  rewardedAddress,
+}: BountyAudioCardProps) {
+  const formatTimestamp = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const truncateAddress = (address: string) => {
+    if (!address) return "";
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
   return (
     <section className="bg-gray-800 p-5 rounded-lg mt-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image
-            src={avatar}
-            alt=""
-            className="w-10 h-10 bg-gray-700 rounded-full"
-          />
-          <div>
-            <h3 className="text-[16px] font-semibold">Madhu Varsha</h3>
-            <p className="text-sm text-gray-400">
-              Posted on Monday, 28 December 2024
-            </p>
-          </div>
-        </div>
+        <p className="text-sm text-gray-400">
+          Posted on {formatTimestamp(timestamp)}
+        </p>
       </div>
       <div className="my-3 flex justify-center w-fit">
         <div className="w-fit bg-gray-700/50 rounded-lg p-2">
@@ -35,17 +54,13 @@ function ClosedBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
       <div className="flex space-x-4">
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
-            Amount: <span className="font-semibold">0.05 ETH</span>
+            Amount: <span className="font-semibold">{bountyAmount} ETH</span>
           </p>
         </div>
+
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
-            Expires in: <span className="font-semibold">2 days</span>
-          </p>
-        </div>
-        <div className="bg-gray-600 w-fit px-3 rounded-xl ">
-          <p className="text-white">
-            Responses: <span className="font-semibold">20</span>
+            Responses: <span className="font-semibold">{responseCount}</span>
           </p>
         </div>
       </div>
@@ -61,11 +76,10 @@ function ClosedBountyAudioCard({ audioUrl }: BountyAudioCardProps) {
               className="w-10 h-10 bg-gray-700 rounded-full"
             />
             <div>
-              <h3 className="text-[16px] font-semibold">John Doe</h3>
+              <h3 className="text-[16px] font-semibold">
+                {truncateAddress(rewardedAddress)}
+              </h3>
             </div>
-          </div>
-          <div className="bg-gray-600 px-3 py-1 rounded-lg">
-            <p className="text-white font-semibold">0.05 ETH</p>
           </div>
         </div>
       </div>
