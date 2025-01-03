@@ -2,7 +2,13 @@
 
 import React, { useState } from "react";
 
-function ViewTextCard() {
+interface ViewTextCardProps {
+  content: string;
+  timestamp: string;
+  postId: string;
+}
+
+function ViewTextCard({ content, timestamp }: ViewTextCardProps) {
   const [showBountyModal, setShowBountyModal] = useState(false);
   const [bountyAmount, setBountyAmount] = useState("0.005");
 
@@ -15,15 +21,10 @@ function ViewTextCard() {
     <>
       <section className="bg-gray-800 p-5 rounded-lg mt-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-400">
-            Posted on Monday, 28 December 2024
-          </p>
+          <p className="text-sm text-gray-400">Posted on {timestamp}</p>
         </div>
         <div className="my-3">
-          <p className="text-[17px]">
-            Lorem ipsum is simply dummy text of the printing and typesetting
-            industry.
-          </p>
+          <p className="text-[17px]">{content}</p>
         </div>
 
         <button

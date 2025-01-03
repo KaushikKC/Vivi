@@ -5,8 +5,10 @@ import AudioPlayer from "./AudioPlayer";
 
 interface ViewAudioCardProps {
   audioUrl: string;
+  timestamp: string;
+  postId: string;
 }
-function ViewAudioCard({ audioUrl }: ViewAudioCardProps) {
+function ViewAudioCard({ audioUrl, timestamp }: ViewAudioCardProps) {
   const [showBountyModal, setShowBountyModal] = useState(false);
   const [bountyAmount, setBountyAmount] = useState("0.005");
 
@@ -19,9 +21,7 @@ function ViewAudioCard({ audioUrl }: ViewAudioCardProps) {
     <>
       <section className="bg-gray-800 p-5 rounded-lg mt-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-400">
-            Posted on Monday, 28 December 2024
-          </p>
+          <p className="text-sm text-gray-400">Posted on {timestamp}</p>
         </div>
         <div className="my-3 flex justify-center w-fit">
           <div className="w-fit bg-gray-700/50 rounded-lg p-2">

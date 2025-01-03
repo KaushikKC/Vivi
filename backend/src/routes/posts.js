@@ -260,6 +260,32 @@ router.put("/:postId", async (req, res) => {
 });
 
 /**
+ * @route GET /api/posts/user/:walletAddress
+ * @desc Get all posts created by a specific wallet address
+ * @access Public
+ */
+router.get("/user/:walletAddress", async (req, res) => {
+  try {
+    const { walletAddress } = req.params;
+
+    const posts = await Post.find({
+      creatorAddress: walletAddress,
+    }).sort({ timestamp: -1 }); // Sort by newest first
+
+    res.status(200).json({
+      success: true,
+      data: posts,
+      count: posts.length,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+/**
  * @route DELETE /api/posts/:postId
  * @desc Delete a post
  * @access Private
