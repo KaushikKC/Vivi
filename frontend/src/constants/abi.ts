@@ -25,12 +25,6 @@ export const abi = [
         name: "bountyAmount",
         type: "uint256",
       },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "bountyToken",
-        type: "address",
-      },
     ],
     name: "BountyAdded",
     type: "event",
@@ -120,6 +114,25 @@ export const abi = [
         type: "uint256",
       },
       {
+        indexed: true,
+        internalType: "address",
+        name: "disliker",
+        type: "address",
+      },
+    ],
+    name: "CommentDisliked",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "commentId",
+        type: "uint256",
+      },
+      {
         indexed: false,
         internalType: "string",
         name: "newContentHash",
@@ -152,19 +165,13 @@ export const abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
-        name: "token",
-        type: "address",
-      },
-      {
         indexed: false,
         internalType: "uint256",
         name: "amount",
         type: "uint256",
       },
     ],
-    name: "EmergencyTokenRecovered",
+    name: "EmergencyEthRecovered",
     type: "event",
   },
   {
@@ -238,14 +245,27 @@ export const abi = [
         name: "bountyAmount",
         type: "uint256",
       },
+    ],
+    name: "PostCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
       {
-        indexed: false,
+        indexed: true,
+        internalType: "uint256",
+        name: "postId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
         internalType: "address",
-        name: "bountyToken",
+        name: "disliker",
         type: "address",
       },
     ],
-    name: "PostCreated",
+    name: "PostDisliked",
     type: "event",
   },
   {
@@ -268,30 +288,16 @@ export const abi = [
     type: "event",
   },
   {
-    stateMutability: "payable",
-    type: "fallback",
-  },
-  {
     inputs: [
       {
         internalType: "uint256",
         name: "postId",
         type: "uint256",
       },
-      {
-        internalType: "uint256",
-        name: "bountyAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "bountyToken",
-        type: "address",
-      },
     ],
     name: "addBountyToPost",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
   {
@@ -330,7 +336,7 @@ export const abi = [
         type: "uint256",
       },
       {
-        internalType: "address",
+        internalType: "address payable",
         name: "winner",
         type: "address",
       },
@@ -361,6 +367,30 @@ export const abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "commentDislikes",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -451,16 +481,6 @@ export const abi = [
         name: "postType",
         type: "uint8",
       },
-      {
-        internalType: "uint256",
-        name: "bountyAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "bountyToken",
-        type: "address",
-      },
     ],
     name: "createPost",
     outputs: [],
@@ -487,6 +507,32 @@ export const abi = [
         name: "commentId",
         type: "uint256",
       },
+    ],
+    name: "dislikeComment",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "postId",
+        type: "uint256",
+      },
+    ],
+    name: "dislikePost",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "commentId",
+        type: "uint256",
+      },
       {
         internalType: "string",
         name: "newContentHash",
@@ -496,6 +542,54 @@ export const abi = [
     name: "editComment",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "hasDislikedComment",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "hasDislikedPost",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -635,6 +729,30 @@ export const abi = [
         type: "uint256",
       },
     ],
+    name: "postDislikes",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     name: "postLikes",
     outputs: [
       {
@@ -682,11 +800,6 @@ export const abi = [
         type: "uint256",
       },
       {
-        internalType: "address",
-        name: "bountyToken",
-        type: "address",
-      },
-      {
         internalType: "bool",
         name: "isActive",
         type: "bool",
@@ -696,19 +809,8 @@ export const abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "token",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "recoverToken",
+    inputs: [],
+    name: "recoverEth",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

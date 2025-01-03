@@ -77,6 +77,15 @@ const postSchema = new mongoose.Schema(
       type: Number,
       default: Date.now,
     },
+    hasBounty: {
+      type: Boolean,
+      default: false,
+    },
+    bountyStatus: {
+      type: String,
+      enum: ["NONE", "OPEN", "CLOSED"],
+      default: "NONE",
+    },
   },
   {
     timestamps: true,

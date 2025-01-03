@@ -125,6 +125,8 @@ router.post("/:postId/bounty", async (req, res) => {
     post.bountyToken = bountyToken;
     post.bountyMetadata = bountyMetadata;
     post.bountyContentHash = result.path;
+    post.hasBounty = true;
+    post.bountyStatus = "OPEN";
 
     await post.save();
 
@@ -139,6 +141,49 @@ router.post("/:postId/bounty", async (req, res) => {
       status: "error",
       message: error.message,
     });
+  }
+});
+
+/**
+ * @route PUT /api/posts/:postId/bounty-status
+ * @desc Update bounty status
+ * @access Private
+ */
+router.put("/:postId/bounty-status", async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!["OPEN", "CLOSED"].includes(status)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid bounty status. Must be either OPEN or CLOSED",
+      });
+    }
+
+    const post = await Post.findOne({ postId: req.params.postId });
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    if (!post.hasBounty) {
+      return res.status(400).json({ error: "Post does not have a bounty" });
+    }
+
+    if (post.creatorAddress !== req.walletAddress) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    post.bountyStatus = status;
+    await post.save();
+
+    res.json({
+      success: true,
+      message: `Bounty status updated to ${status}`,
+      post,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -231,7 +276,7 @@ router.delete("/:postId", async (req, res) => {
       return res.status(403).json({ error: "Not authorized" });
     }
 
-    if (post.bountyAmount > 0) {
+    if (post.hasBounty && post.bountyStatus === "OPEN") {
       return res.status(400).json({
         error: "Cannot delete post with active bounty",
       });

@@ -411,7 +411,7 @@ function Details() {
             )}
 
             {post.postType === "VOICE" && post.contentHash && (
-              <AudioPlayer audioUrl={post.contentHash} />
+              <AudioContent post={post} />
             )}
 
             <div className="flex items-center gap-4 mt-4">
@@ -614,3 +614,50 @@ function Details() {
 }
 
 export default Details;
+
+const AudioContent: React.FC<{ post: Post | null }> = ({ post }) => {
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  console.log("I'm");
+  useEffect(() => {
+    if (post?.postType === "VOICE") {
+      console.log("I'm here");
+      if (post.content?.voice?.data) {
+        console.log("I'm inside");
+        // // For binary audio data
+        // const base64Audio = post.content.voice.data;
+        // const blob = new Blob([Buffer.from(base64Audio, "base64")], {
+        //   type: post.content.voice.contentType || "audio/wav",
+        // });
+
+        const base64String =
+          typeof post.content.voice.data === "object"
+            ? Buffer.from(post.content.voice.data).toString("base64")
+            : post.content.voice.data;
+
+        // Create blob from base64
+        const byteCharacters = Buffer.from(base64String, "base64").toString(
+          "binary"
+        );
+        const byteNumbers = new Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "audio/wav" });
+        const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
+
+        // Cleanup
+        return () => {
+          URL.revokeObjectURL(url);
+        };
+      }
+    }
+  }, [post]);
+
+  if (!audioUrl) return null;
+
+  return <AudioPlayer audioUrl={audioUrl} />;
+};

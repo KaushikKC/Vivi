@@ -111,15 +111,13 @@ const TextCard: React.FC<TextCardProps> = ({
     }
 
     try {
-      if (type === "like") {
-        // Call smart contract
-        writeContract({
-          address: contractAddress,
-          abi: abi,
-          functionName: "likePost",
-          args: [BigInt(postId)],
-        });
-      }
+      // Call smart contract
+      writeContract({
+        address: contractAddress,
+        abi: abi,
+        functionName: type === "like" ? "likePost" : "dislikePost",
+        args: [BigInt(postId)],
+      });
 
       // Call backend API
       const response = await axios.post(

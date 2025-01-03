@@ -15,7 +15,6 @@ import AudioPlayer from "../../components/AudioPlayer";
 import ConnectWalletSection from "@/components/ConnectWalletButton";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import axios from "axios";
-import { parseEther } from "viem";
 import { contractAddress } from "@/constants/contractAddress";
 import { abi } from "@/constants/abi";
 
@@ -66,7 +65,6 @@ const Dashboard: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState<string>("");
-  const [bountyAmount, setBountyAmount] = useState<string>("0");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isUploading, setIsUploading] = useState(false);
   const { data: postCount } = useReadContract({
@@ -258,12 +256,7 @@ const Dashboard: React.FC = () => {
           address: contractAddress,
           abi: abi,
           functionName: "createPost",
-          args: [
-            metadataHash,
-            postType === "audio" ? 1 : 0,
-            parseEther(bountyAmount),
-            "0x0000000000000000000000000000000000000000",
-          ],
+          args: [metadataHash, postType === "audio" ? 1 : 0],
         },
         {
           onSuccess: async () => {
@@ -283,7 +276,6 @@ const Dashboard: React.FC = () => {
                 setContent("");
                 setAudioUrl("");
                 setSelectedImage(null);
-                setBountyAmount("0");
                 setPostType("text");
                 setIsAnonymous(false);
 
