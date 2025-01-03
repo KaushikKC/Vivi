@@ -121,7 +121,7 @@ router.post("/:postId/bounty", async (req, res) => {
     }
 
     // Update post with bounty information
-    post.bountyAmount = bountyMetadata.bountyAmount;
+    post.bountyAmount = bountyAmount;
     post.hasBounty = true;
     post.bountyStatus = "OPEN";
 

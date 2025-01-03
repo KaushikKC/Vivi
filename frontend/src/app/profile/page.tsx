@@ -272,6 +272,7 @@ const Profile: React.FC = () => {
                   content={post.content || ""}
                   timestamp={post.timestamp}
                   postId={post.postId}
+                  id={post._id}
                 />
               );
             }

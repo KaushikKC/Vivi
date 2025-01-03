@@ -7,8 +7,9 @@ interface ViewAudioCardProps {
   audioUrl: string | undefined;
   timestamp: number;
   postId: number;
+  id: string;
 }
-function ViewAudioCard({ audioUrl, timestamp }: ViewAudioCardProps) {
+function ViewAudioCard({ audioUrl, timestamp, id }: ViewAudioCardProps) {
   const [showBountyModal, setShowBountyModal] = useState(false);
   const [bountyAmount, setBountyAmount] = useState("0.005");
 
