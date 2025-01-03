@@ -101,13 +101,13 @@ router.post("/", upload.single("voice"), async (req, res) => {
  */
 router.post("/:postId/bounty", async (req, res) => {
   try {
-    const { bountyAmount, bountyToken, metadataHash } = req.body;
+    const { bountyAmount } = req.body;
 
     // Validate input
-    if (!bountyAmount || !ethers.utils.isAddress(bountyToken)) {
+    if (!bountyAmount) {
       return res.status(400).json({
         status: "error",
-        message: "Invalid bounty amount or token address",
+        message: "Invalid bounty amount",
       });
     }
 
@@ -122,9 +122,6 @@ router.post("/:postId/bounty", async (req, res) => {
 
     // Update post with bounty information
     post.bountyAmount = bountyMetadata.bountyAmount;
-    post.bountyToken = bountyToken;
-    post.bountyMetadata = bountyMetadata;
-    post.bountyContentHash = result.path;
     post.hasBounty = true;
     post.bountyStatus = "OPEN";
 

@@ -40,14 +40,6 @@ const postSchema = new mongoose.Schema(
       type: String,
       default: "0",
     },
-    bountyToken: {
-      type: String,
-      default: ethers.ZeroAddress,
-    },
-    bountyContentHash: String,
-    bountyMetadata: {
-      type: Object,
-    },
     likes: [
       {
         type: String, // wallet addresses

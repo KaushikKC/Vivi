@@ -2,10 +2,14 @@
 
 import React, { useState } from "react";
 
+interface PostContent {
+  text?: string;
+  image?: string;
+}
 interface ViewTextCardProps {
-  content: string;
-  timestamp: string;
-  postId: string;
+  content: PostContent;
+  timestamp: number;
+  postId: number;
 }
 
 function ViewTextCard({ content, timestamp }: ViewTextCardProps) {
@@ -17,14 +21,26 @@ function ViewTextCard({ content, timestamp }: ViewTextCardProps) {
     setShowBountyModal(false);
   };
 
+  const formatDate = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <>
       <section className="bg-gray-800 p-5 rounded-lg mt-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-400">Posted on {timestamp}</p>
+          <p className="text-sm text-gray-400">
+            Posted on {formatDate(timestamp)}
+          </p>
         </div>
         <div className="my-3">
-          <p className="text-[17px]">{content}</p>
+          <p className="text-[17px]">{content.text}</p>
         </div>
 
         <button

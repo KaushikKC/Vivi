@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import AudioPlayer from "./AudioPlayer";
 
 interface ViewAudioCardProps {
-  audioUrl: string;
-  timestamp: string;
-  postId: string;
+  audioUrl: string | undefined;
+  timestamp: number;
+  postId: number;
 }
 function ViewAudioCard({ audioUrl, timestamp }: ViewAudioCardProps) {
   const [showBountyModal, setShowBountyModal] = useState(false);
@@ -17,11 +17,23 @@ function ViewAudioCard({ audioUrl, timestamp }: ViewAudioCardProps) {
     setShowBountyModal(false);
   };
 
+  const formatDate = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <>
       <section className="bg-gray-800 p-5 rounded-lg mt-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-400">Posted on {timestamp}</p>
+          <p className="text-sm text-gray-400">
+            Posted on {formatDate(timestamp)}
+          </p>
         </div>
         <div className="my-3 flex justify-center w-fit">
           <div className="w-fit bg-gray-700/50 rounded-lg p-2">
