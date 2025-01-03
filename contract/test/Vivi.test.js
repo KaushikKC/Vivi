@@ -7,34 +7,19 @@ describe("Vivi", function () {
   let owner;
   let addr1;
   let addr2;
-  let mockToken;
+  let addr3;
 
   beforeEach(async function () {
     try {
       // Get signers
-      [owner, addr1, addr2] = await ethers.getSigners();
-
-      // Deploy MockERC20
-      const MockToken = await ethers.getContractFactory("MockERC20");
-      mockToken = await MockToken.deploy("Mock Token", "MTK");
+      [owner, addr1, addr2, addr3] = await ethers.getSigners();
 
       // Deploy Vivi
       Vivi = await ethers.getContractFactory("Vivi");
       vivi = await Vivi.deploy();
 
-      // Wait for deployments
-      await Promise.all([
-        mockToken.waitForDeployment(),
-        vivi.waitForDeployment(),
-      ]);
-
-      // Get contract addresses
-      const mockTokenAddress = await mockToken.getAddress();
-      const viviAddress = await vivi.getAddress();
-
-      // Mint tokens
-      await mockToken.mint(addr1.address, ethers.parseEther("1000"));
-      await mockToken.mint(addr2.address, ethers.parseEther("1000"));
+      // Wait for deployment
+      await vivi.waitForDeployment();
     } catch (error) {
       console.error("Deployment Error:", error);
       throw error;
@@ -42,17 +27,14 @@ describe("Vivi", function () {
   });
 
   describe("Post Creation and Management", function () {
-    it("Should create a post correctly", async function () {
+    it("Should create a post correctly with bounty", async function () {
       const contentHash = "QmTest123";
       const postType = 0; // TEXT
-      const bountyAmount = ethers.parseEther("100");
-      const mockTokenAddress = await mockToken.getAddress();
-      const viviAddress = await vivi.getAddress();
+      const bountyAmount = ethers.parseEther("1");
 
-      await mockToken.connect(addr1).approve(viviAddress, bountyAmount);
-      await vivi
-        .connect(addr1)
-        .createPost(contentHash, postType, bountyAmount, mockTokenAddress);
+      await vivi.connect(addr1).createPost(contentHash, postType, {
+        value: bountyAmount,
+      });
 
       const post = await vivi.posts(1);
       expect(post.creator).to.equal(addr1.address);
@@ -61,13 +43,57 @@ describe("Vivi", function () {
       expect(post.bountyAmount).to.equal(bountyAmount);
       expect(post.isActive).to.equal(true);
     });
+
+    it("Should create a post without bounty", async function () {
+      await vivi.connect(addr1).createPost("QmTest123", 0);
+      const post = await vivi.posts(1);
+      expect(post.bountyAmount).to.equal(0);
+    });
+
+    it("Should allow adding bounty to existing post", async function () {
+      await vivi.connect(addr1).createPost("QmTest123", 0);
+      const bountyAmount = ethers.parseEther("1");
+
+      await vivi.connect(addr2).addBountyToPost(1, {
+        value: bountyAmount,
+      });
+
+      const post = await vivi.posts(1);
+      expect(post.bountyAmount).to.equal(bountyAmount);
+    });
+
+    it("Should allow post creator to award bounty", async function () {
+      const bountyAmount = ethers.parseEther("1");
+      await vivi.connect(addr1).createPost("QmTest123", 0, {
+        value: bountyAmount,
+      });
+
+      const initialBalance = await ethers.provider.getBalance(addr2.address);
+      await vivi.connect(addr1).awardBounty(1, addr2.address);
+
+      const finalBalance = await ethers.provider.getBalance(addr2.address);
+      expect(finalBalance - initialBalance).to.equal(bountyAmount);
+    });
+
+    it("Should allow post creator to cancel post and receive bounty back", async function () {
+      const bountyAmount = ethers.parseEther("1");
+      await vivi.connect(addr1).createPost("QmTest123", 0, {
+        value: bountyAmount,
+      });
+
+      const initialBalance = await ethers.provider.getBalance(addr1.address);
+      const tx = await vivi.connect(addr1).cancelPost(1);
+      const receipt = await tx.wait();
+      const gasUsed = receipt.gasUsed * receipt.gasPrice;
+
+      const finalBalance = await ethers.provider.getBalance(addr1.address);
+      expect(finalBalance + gasUsed - initialBalance).to.equal(bountyAmount);
+    });
   });
 
   describe("Comments", function () {
     beforeEach(async function () {
-      await vivi
-        .connect(addr1)
-        .createPost("QmTest123", 0, 0, ethers.ZeroAddress);
+      await vivi.connect(addr1).createPost("QmTest123", 0);
     });
 
     it("Should add a comment to a post", async function () {
@@ -86,87 +112,133 @@ describe("Vivi", function () {
       expect(comment.isAnonymous).to.equal(true);
       expect(comment.commenter).to.equal(ethers.ZeroAddress);
     });
-  });
 
-  describe("Likes", function () {
-    beforeEach(async function () {
-      await vivi
-        .connect(addr1)
-        .createPost("QmTest123", 0, 0, ethers.ZeroAddress);
+    it("Should edit comment correctly", async function () {
+      await vivi.connect(addr2).addComment(1, "QmComment123", 0, false);
+      await vivi.connect(addr2).editComment(1, "QmNewComment123");
+
+      const comment = await vivi.comments(1);
+      expect(comment.contentHash).to.equal("QmNewComment123");
     });
 
-    it("Should allow liking a post", async function () {
-      await vivi.connect(addr2).likePost(1);
+    it("Should delete comment correctly", async function () {
+      await vivi.connect(addr2).addComment(1, "QmComment123", 0, false);
+      await vivi.connect(addr2).deleteComment(1);
 
-      const hasLiked = await vivi.hasLikedPost(addr2.address, 1);
-      expect(hasLiked).to.equal(true);
-    });
-
-    it("Should prevent liking a post twice", async function () {
-      await vivi.connect(addr2).likePost(1);
-      await expect(vivi.connect(addr2).likePost(1)).to.be.revertedWith(
-        "You already liked this post"
-      );
+      const comment = await vivi.comments(1);
+      expect(comment.isActive).to.equal(false);
     });
   });
 
-  describe("Bounty System", function () {
+  describe("Likes and Dislikes", function () {
     beforeEach(async function () {
-      const viviAddress = await vivi.getAddress();
-      await mockToken
-        .connect(addr1)
-        .approve(viviAddress, ethers.parseEther("1000"));
+      await vivi.connect(addr1).createPost("QmTest123", 0);
+      await vivi.connect(addr2).addComment(1, "QmComment123", 0, false);
     });
 
-    it("Should add bounty to post", async function () {
-      const mockTokenAddress = await mockToken.getAddress();
-      const viviAddress = await vivi.getAddress();
+    describe("Post Reactions", function () {
+      it("Should allow liking a post", async function () {
+        await vivi.connect(addr2).likePost(1);
+        expect(await vivi.hasLikedPost(addr2.address, 1)).to.be.true;
+      });
 
-      await vivi
-        .connect(addr1)
-        .createPost("QmTest123", 0, ethers.parseEther("100"), mockTokenAddress);
+      it("Should allow disliking a post", async function () {
+        await vivi.connect(addr2).dislikePost(1);
+        expect(await vivi.hasDislikedPost(addr2.address, 1)).to.be.true;
+      });
 
-      await mockToken
-        .connect(addr2)
-        .approve(viviAddress, ethers.parseEther("50"));
-      await vivi
-        .connect(addr2)
-        .addBountyToPost(1, ethers.parseEther("50"), mockTokenAddress);
+      it("Should remove like when disliking", async function () {
+        await vivi.connect(addr2).likePost(1);
+        await vivi.connect(addr2).dislikePost(1);
+        expect(await vivi.hasLikedPost(addr2.address, 1)).to.be.false;
+        expect(await vivi.hasDislikedPost(addr2.address, 1)).to.be.true;
+      });
 
-      const post = await vivi.posts(1);
-      expect(post.bountyAmount).to.equal(ethers.parseEther("150"));
+      it("Should remove dislike when liking", async function () {
+        await vivi.connect(addr2).dislikePost(1);
+        await vivi.connect(addr2).likePost(1);
+        expect(await vivi.hasDislikedPost(addr2.address, 1)).to.be.false;
+        expect(await vivi.hasLikedPost(addr2.address, 1)).to.be.true;
+      });
+
+      it("Should prevent liking twice", async function () {
+        await vivi.connect(addr2).likePost(1);
+        await expect(vivi.connect(addr2).likePost(1)).to.be.revertedWith(
+          "Already liked this post"
+        );
+      });
+
+      it("Should prevent disliking twice", async function () {
+        await vivi.connect(addr2).dislikePost(1);
+        await expect(vivi.connect(addr2).dislikePost(1)).to.be.revertedWith(
+          "Already disliked this post"
+        );
+      });
+    });
+
+    describe("Comment Reactions", function () {
+      it("Should allow liking a comment", async function () {
+        await vivi.connect(addr3).likeComment(1);
+        expect(await vivi.hasLikedComment(addr3.address, 1)).to.be.true;
+      });
+
+      it("Should allow disliking a comment", async function () {
+        await vivi.connect(addr3).dislikeComment(1);
+        expect(await vivi.hasDislikedComment(addr3.address, 1)).to.be.true;
+      });
+
+      it("Should remove like when disliking", async function () {
+        await vivi.connect(addr3).likeComment(1);
+        await vivi.connect(addr3).dislikeComment(1);
+        expect(await vivi.hasLikedComment(addr3.address, 1)).to.be.false;
+        expect(await vivi.hasDislikedComment(addr3.address, 1)).to.be.true;
+      });
+
+      it("Should remove dislike when liking", async function () {
+        await vivi.connect(addr3).dislikeComment(1);
+        await vivi.connect(addr3).likeComment(1);
+        expect(await vivi.hasDislikedComment(addr3.address, 1)).to.be.false;
+        expect(await vivi.hasLikedComment(addr3.address, 1)).to.be.true;
+      });
+
+      it("Should prevent liking twice", async function () {
+        await vivi.connect(addr3).likeComment(1);
+        await expect(vivi.connect(addr3).likeComment(1)).to.be.revertedWith(
+          "Already liked this comment"
+        );
+      });
+
+      it("Should prevent disliking twice", async function () {
+        await vivi.connect(addr3).dislikeComment(1);
+        await expect(vivi.connect(addr3).dislikeComment(1)).to.be.revertedWith(
+          "Already disliked this comment"
+        );
+      });
     });
   });
 
   describe("Emergency Functions", function () {
-    it("Should allow owner to recover stuck tokens", async function () {
-      const mockTokenAddress = await mockToken.getAddress();
-      const viviAddress = await vivi.getAddress();
+    it("Should allow owner to recover ETH", async function () {
+      // Send ETH to contract through post creation
+      await vivi.connect(addr1).createPost("QmTest123", 0, {
+        value: ethers.parseEther("1"),
+      });
 
-      // Mint tokens to owner first
-      await mockToken.mint(owner.address, ethers.parseEther("1000"));
+      const initialBalance = await ethers.provider.getBalance(owner.address);
+      const tx = await vivi.connect(owner).recoverEth();
+      const receipt = await tx.wait();
+      const gasUsed = receipt.gasUsed * receipt.gasPrice;
 
-      // Transfer tokens to contract
-      await mockToken
-        .connect(owner)
-        .transfer(viviAddress, ethers.parseEther("100"));
-      const initialBalance = await mockToken.balanceOf(owner.address);
-
-      // Recover tokens
-      await vivi.recoverToken(mockTokenAddress, ethers.parseEther("100"));
-
-      // Check final balance
-      const finalBalance = await mockToken.balanceOf(owner.address);
-      expect(finalBalance).to.equal(initialBalance + ethers.parseEther("100"));
+      const finalBalance = await ethers.provider.getBalance(owner.address);
+      expect(finalBalance + gasUsed - initialBalance).to.equal(
+        ethers.parseEther("1")
+      );
     });
 
-    it("Should prevent non-owners from recovering tokens", async function () {
-      const mockTokenAddress = await mockToken.getAddress();
-      await expect(
-        vivi
-          .connect(addr1)
-          .recoverToken(mockTokenAddress, ethers.parseEther("100"))
-      ).to.be.revertedWith("Ownable: caller is not the owner");
+    it("Should prevent non-owners from recovering ETH", async function () {
+      await expect(vivi.connect(addr1).recoverEth()).to.be.revertedWith(
+        "Ownable: caller is not the owner"
+      );
     });
   });
 });

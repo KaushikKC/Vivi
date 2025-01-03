@@ -28,6 +28,7 @@ const config = {
       verifyURL:
         "https://api-explorer-verify.staging.lens.zksync.dev/contract_verification",
       zksync: true,
+      timeout: 100000,
     },
     hardhat: {
       zksync: true,

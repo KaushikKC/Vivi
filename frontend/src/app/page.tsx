@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const checkUserProfile = async (address: string) => {
     try {
       const response = await fetch(
-        `http://localhost:3500/api/users/profile/${address}`
+        `https://vivi-backend.vercel.app/api/users/profile/${address}`
       );
       return response.ok; // Returns true if profile exists, false otherwise
     } catch (error) {
