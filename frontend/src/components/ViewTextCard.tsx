@@ -49,7 +49,7 @@ function ViewTextCard({ id, content, timestamp, postId }: ViewTextCardProps) {
               // Call backend API
               const apiResponse = await axios.post(
                 `https://vivi-backend.vercel.app/api/posts/${id}/bounty`,
-                bountyAmount,
+                parseEther(bountyAmount),
                 {
                   headers: {
                     "Content-Type": "multipart/form-data",

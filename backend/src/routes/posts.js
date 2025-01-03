@@ -128,9 +128,7 @@ router.post("/:postId/bounty", async (req, res) => {
     await post.save();
 
     res.json({
-      contentHash: metadataHash,
       status: "success",
-      bountyMetadata,
     });
   } catch (error) {
     console.error("Bounty addition error:", error);
