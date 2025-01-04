@@ -7,6 +7,7 @@ import { abi } from "@/constants/abi";
 import { parseEther } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 interface ViewAudioCardProps {
   audioUrl: string | undefined;
@@ -29,11 +30,12 @@ function ViewAudioCard({
 
   const handleAddBounty = async () => {
     if (!address) {
-      alert("Please connect your wallet first");
+      toast.error("Please connect your wallet first");
       return;
     }
 
     setIsProcessing(true);
+    toast.loading("Processing bounty transaction...", { id: "bounty" });
     try {
       // Call smart contract
       writeContract(
@@ -62,22 +64,22 @@ function ViewAudioCard({
                 // Reset and close modal
                 setBountyAmount("0.005");
                 setShowBountyModal(false);
-                // You might want to add a success notification here
+                toast.success("Bounty added successfully!", { id: "bounty" });
               }
             } catch (error) {
               console.error("Error saving bounty to backend:", error);
-              alert("Failed to save bounty to backend");
+              toast.error("Failed to save bounty to backend", { id: "bounty" });
             }
           },
           onError: (error) => {
             console.error("Transaction failed:", error);
-            alert("Transaction failed");
+            toast.error("Transaction failed", { id: "bounty" });
           },
         }
       );
     } catch (error) {
       console.error("Error adding bounty:", error);
-      alert("Failed to add bounty");
+      toast.error("Failed to add bounty", { id: "bounty" });
     } finally {
       setIsProcessing(false);
     }
@@ -95,6 +97,25 @@ function ViewAudioCard({
 
   return (
     <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          success: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #3B82F6",
+            },
+          },
+          error: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #EF4444",
+            },
+          },
+        }}
+      />
       <section className="bg-gray-800 p-5 rounded-lg mt-4">
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-400">

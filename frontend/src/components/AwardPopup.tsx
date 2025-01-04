@@ -8,6 +8,7 @@ import { contractAddress } from "@/constants/contractAddress";
 import { abi } from "@/constants/abi";
 import { useAccount, useWriteContract } from "wagmi";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 interface Comment {
   _id: string;
@@ -92,16 +93,17 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
   };
   const handlePayReward = async () => {
     if (!selectedUser) {
-      alert("Please select a user to pay the reward.");
+      toast.error("Please select a user to pay the reward");
       return;
     }
 
     if (!address) {
-      alert("Please connect your wallet first");
+      toast.error("Please connect your wallet first");
       return;
     }
 
     setIsProcessing(true);
+    toast.loading("Processing reward payment...", { id: "reward" });
     try {
       // Call smart contract
       await writeContract(
@@ -128,24 +130,23 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
               );
 
               if (apiResponse.data.status === "success") {
+                toast.success("Bounty paid successfully!", { id: "reward" });
                 onClose(); // Close the popup
-                // You might want to add a success notification here
-                // toast.success("Bounty paid successfully!");
               }
             } catch (error) {
               console.error("Error updating bounty status:", error);
-              // toast.error("Failed to update bounty status");
+              toast.error("Failed to update bounty status", { id: "reward" });
             }
           },
           onError: (error) => {
             console.error("Transaction failed:", error);
-            // toast.error("Transaction failed");
+            toast.error("Transaction failed", { id: "reward" });
           },
         }
       );
     } catch (error) {
       console.error("Error paying bounty:", error);
-      // toast.error("Failed to pay bounty");
+      toast.error("Failed to pay bounty");
     } finally {
       setIsProcessing(false);
     }
@@ -155,6 +156,25 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          success: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #3B82F6",
+            },
+          },
+          error: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #EF4444",
+            },
+          },
+        }}
+      />
       <div className="bg-gray-800 p-8 rounded-lg w-[600px] shadow-lg transform transition-all duration-300">
         {/* Top section displaying total responses and bounty */}
         <div className="flex items-center mb-6">

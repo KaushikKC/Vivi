@@ -18,6 +18,7 @@ import { useAccount, useWriteContract } from "wagmi";
 import axios from "axios";
 import { contractAddress } from "@/constants/contractAddress";
 import { abi } from "@/constants/abi";
+import toast, { Toaster } from "react-hot-toast";
 
 // Types remain the same...
 interface Post {
@@ -212,6 +213,7 @@ function Details() {
     }
 
     let attempts = 0;
+    toast.loading("Uploading to IPFS...", { id: "ipfs-upload" });
     while (attempts < API_CONFIG.maxRetries) {
       try {
         const response = await axios.post(
@@ -227,18 +229,26 @@ function Details() {
           }
         );
 
+        toast.success("Successfully uploaded to IPFS!", { id: "ipfs-upload" });
         return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
       } catch (error: unknown) {
         if (axios.isAxiosError(error) && error.response?.status === 429) {
           attempts++;
+          toast.loading(`Retrying upload... Attempt ${attempts}`, {
+            id: "ipfs-upload",
+          });
           await new Promise((resolve) =>
             setTimeout(resolve, API_CONFIG.retryDelay * attempts)
           );
           continue;
         }
+        toast.error("Failed to upload to IPFS", { id: "ipfs-upload" });
         throw error;
       }
     }
+    toast.error("Failed to upload after multiple attempts", {
+      id: "ipfs-upload",
+    });
     throw new Error("Failed to upload to IPFS after multiple attempts");
   };
 
@@ -261,12 +271,15 @@ function Details() {
           });
           const url = URL.createObjectURL(audioBlob);
           setAudioUrl(url);
+          toast.success("Recording completed!");
         };
 
         mediaRecorderRef.current.start();
         setIsRecording(true);
+        toast.success("Recording started...");
       } catch (error) {
         console.error("Error accessing microphone:", error);
+        toast.error("Failed to access microphone");
       }
     } else {
       mediaRecorderRef.current?.stop();
@@ -277,15 +290,18 @@ function Details() {
   const handleAddComment = async () => {
     if (!address) {
       alert("Please connect your wallet first");
+      toast.error("Please connect your wallet first");
       return;
     }
 
     if (!postId || Array.isArray(postId)) {
       alert("Invalid post ID");
+      toast.error("Invalid post ID");
       return;
     }
 
     try {
+      toast.loading("Uploading comment...", { id: "comment" });
       const formData = new FormData();
       let contentHash;
 
@@ -338,22 +354,28 @@ function Details() {
                 setAudioUrl("");
                 setPostType("text");
                 setIsAnonymous(false);
-
+                toast.success("Comment added successfully!", { id: "comment" });
                 // Optionally refresh comments
                 // await fetchComments();
               }
             } catch (error) {
               console.error("Error saving to backend:", error);
+              toast.error("Failed to save comment to backend", {
+                id: "comment",
+              });
             }
           },
           onError: (error) => {
             console.error("Transaction failed:", error);
+            toast.error("Transaction failed", { id: "comment" });
           },
         }
       );
     } catch (error) {
       console.error("Error adding comment:", error);
-      alert("Failed to add comment. Please try again.");
+      toast.error("Failed to add comment. Please try again.", {
+        id: "comment",
+      });
     }
   };
 
@@ -364,6 +386,25 @@ function Details() {
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          success: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #3B82F6",
+            },
+          },
+          error: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #EF4444",
+            },
+          },
+        }}
+      />
       <div className="absolute flex justify-between w-full top-6">
         <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
           <Link href="/">

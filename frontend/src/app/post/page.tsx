@@ -17,6 +17,7 @@ import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import axios from "axios";
 import { contractAddress } from "@/constants/contractAddress";
 import { abi } from "@/constants/abi";
+import toast, { Toaster } from "react-hot-toast";
 
 interface VoiceData {
   data: string | Buffer;
@@ -100,12 +101,15 @@ const Dashboard: React.FC = () => {
           });
           const url = URL.createObjectURL(audioBlob);
           setAudioUrl(url);
+          toast.success("Recording completed!");
         };
 
         mediaRecorderRef.current.start();
         setIsRecording(true);
+        toast.success("Recording started...");
       } catch (error) {
         console.error("Error accessing microphone:", error);
+        toast.error("Failed to access microphone");
       }
     } else {
       mediaRecorderRef.current?.stop();
@@ -140,6 +144,7 @@ const Dashboard: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
+        toast.error("Failed to load posts");
       } finally {
         setLoading(false);
       }
@@ -181,6 +186,8 @@ const Dashboard: React.FC = () => {
         formData.append("file", file);
       }
 
+      toast.loading("Uploading to IPFS...", { id: "ipfs-upload" });
+
       const response = await axios.post(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
         formData,
@@ -193,10 +200,11 @@ const Dashboard: React.FC = () => {
           },
         }
       );
-
+      toast.success("Successfully uploaded to IPFS!", { id: "ipfs-upload" });
       return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
     } catch (error) {
       console.error("Error uploading to IPFS:", error);
+      toast.error("Failed to upload to IPFS", { id: "ipfs-upload" });
       throw error;
     }
   };
@@ -279,21 +287,23 @@ const Dashboard: React.FC = () => {
                 setPostType("text");
                 setIsAnonymous(false);
 
-                // Show success message or trigger refresh
-                console.log("Post created successfully:", apiResponse.data);
+                toast.success("Post created successfully!");
               }
             } catch (error) {
               console.error("Error saving to backend:", error);
+              toast.error("Failed to save post to backend");
             }
           },
           onError: (error) => {
             console.error("Transaction failed:", error);
+            toast.error("Transaction failed");
             setIsUploading(false);
           },
         }
       );
     } catch (error) {
       console.error("Error creating post:", error);
+      toast.error("Failed to create post");
       setIsUploading(false);
     }
   };
@@ -305,6 +315,25 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          success: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #3B82F6",
+            },
+          },
+          error: {
+            style: {
+              background: "#1E293B",
+              color: "#fff",
+              border: "1px solid #EF4444",
+            },
+          },
+        }}
+      />
       {/* Header */}
       <div className="absolute flex justify-between w-full top-6">
         <div className=" left-0 flex items-center justify-start space-x-3 mr-5">
