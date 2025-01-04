@@ -154,15 +154,12 @@ const Dashboard: React.FC = () => {
   }, [address]);
 
   useEffect(() => {
-    console.log("hi conloging the post");
     const fetchPosts = async () => {
       try {
         const response = await axios.get(
           "https://vivi-backend.vercel.app/api/posts"
         );
-        console.log("post", response);
         if (response.status) {
-          console.log("post", response);
           setPosts(response.data.data);
         }
       } catch (error) {

@@ -17,9 +17,16 @@ interface ViewTextCardProps {
   content: PostContent;
   timestamp: number;
   postId: number;
+  hasBounty: boolean;
 }
 
-function ViewTextCard({ id, content, timestamp, postId }: ViewTextCardProps) {
+function ViewTextCard({
+  id,
+  content,
+  timestamp,
+  postId,
+  hasBounty,
+}: ViewTextCardProps) {
   const [showBountyModal, setShowBountyModal] = useState(false);
   const [bountyAmount, setBountyAmount] = useState("0.005");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -50,12 +57,15 @@ function ViewTextCard({ id, content, timestamp, postId }: ViewTextCardProps) {
             try {
               toast.loading("Saving bounty details...", { id: "bounty" });
               // Call backend API
+              const bountyInWei = parseEther(bountyAmount);
               const apiResponse = await axios.post(
                 `https://vivi-backend.vercel.app/api/posts/${id}/bounty`,
-                parseEther(bountyAmount),
+                {
+                  bountyAmount: Number(bountyInWei),
+                },
                 {
                   headers: {
-                    "Content-Type": "multipart/form-data",
+                    "Content-Type": "application/json",
                   },
                 }
               );
@@ -126,12 +136,18 @@ function ViewTextCard({ id, content, timestamp, postId }: ViewTextCardProps) {
           <p className="text-[17px]">{content.text}</p>
         </div>
 
-        <button
-          onClick={() => setShowBountyModal(true)}
-          className="text-[16px] my-3 font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200 whitespace-nowrap "
-        >
-          Add Bounty
-        </button>
+        {hasBounty ? (
+          <div className="text-[16px] my-3 font-semibold text-[#7482F1]">
+            Bounty Added
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowBountyModal(true)}
+            className="text-[16px] my-3 font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200 whitespace-nowrap"
+          >
+            Add Bounty
+          </button>
+        )}
       </section>
       {/* Bounty Modal */}
       {showBountyModal && (

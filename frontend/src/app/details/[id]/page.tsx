@@ -658,18 +658,9 @@ export default Details;
 
 const AudioContent: React.FC<{ post: Post | null }> = ({ post }) => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  console.log("I'm");
   useEffect(() => {
     if (post?.postType === "VOICE") {
-      console.log("I'm here");
       if (post.content?.voice?.data) {
-        console.log("I'm inside");
-        // // For binary audio data
-        // const base64Audio = post.content.voice.data;
-        // const blob = new Blob([Buffer.from(base64Audio, "base64")], {
-        //   type: post.content.voice.contentType || "audio/wav",
-        // });
-
         const base64String =
           typeof post.content.voice.data === "object"
             ? Buffer.from(post.content.voice.data).toString("base64")

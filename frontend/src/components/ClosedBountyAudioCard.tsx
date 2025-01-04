@@ -4,6 +4,7 @@ import Image from "next/image";
 import React from "react";
 import avatar from "../images/avatar.png";
 import AudioPlayer from "./AudioPlayer";
+import { formatEther } from "viem";
 
 interface BountyAudioCardProps {
   audioUrl: string;
@@ -34,6 +35,15 @@ function ClosedBountyAudioCard({
     });
   };
 
+  const formatBountyAmount = (amount: string) => {
+    try {
+      return `${formatEther(BigInt(amount))} ETH`;
+    } catch (error) {
+      console.error("Error formatting bounty amount:", error);
+      return "0 ETH";
+    }
+  };
+
   const truncateAddress = (address: string) => {
     if (!address) return "";
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
@@ -54,7 +64,11 @@ function ClosedBountyAudioCard({
       <div className="flex space-x-4">
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
-            Amount: <span className="font-semibold">{bountyAmount} ETH</span>
+            Amount:{" "}
+            <span className="font-semibold">
+              {" "}
+              {formatBountyAmount(bountyAmount)}
+            </span>
           </p>
         </div>
 

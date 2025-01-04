@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import AwardPopup from "./AwardPopup";
+import { formatEther } from "viem";
 
 interface PendingBountyTextCardProps {
   content: string;
@@ -39,7 +40,7 @@ function PendingBountyTextCard({
   responseCount = 0,
 }: PendingBountyTextCardProps) {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [comments, setComments] = useState<Comment>();
+  const [comments, setComments] = useState<Comment[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,6 +58,15 @@ function PendingBountyTextCard({
   const handlePayReward = (selectedUser: string) => {
     alert(`Reward paid to ${selectedUser}`);
     // Implement logic for paying the reward to the selected user.
+  };
+
+  const formatBountyAmount = (amount: string) => {
+    try {
+      return `${formatEther(BigInt(amount))} ETH`;
+    } catch (error) {
+      console.error("Error formatting bounty amount:", error);
+      return "0 ETH";
+    }
   };
 
   // Fetch comments when popup is opened
@@ -84,8 +94,6 @@ function PendingBountyTextCard({
     fetchComments();
   }, [isPopupVisible, postId]);
 
-  console.log(comments);
-
   // Toggle popup visibility
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
   return (
@@ -101,7 +109,11 @@ function PendingBountyTextCard({
       <div className="flex space-x-4">
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
-            Amount: <span className="font-semibold">{bountyAmount} ETH</span>
+            Amount:{" "}
+            <span className="font-semibold">
+              {" "}
+              {formatBountyAmount(bountyAmount)}
+            </span>
           </p>
         </div>
 

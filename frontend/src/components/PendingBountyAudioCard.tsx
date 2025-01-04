@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import AudioPlayer from "./AudioPlayer";
 import AwardPopup from "./AwardPopup"; // Import the AwardPopup component
+import { formatEther } from "viem";
 
 interface BountyAudioCardProps {
   audioUrl: string;
@@ -41,7 +42,7 @@ function PendingBountyAudioCard({
   responseCount = 0,
 }: BountyAudioCardProps) {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [comments, setComments] = useState<Comment>();
+  const [comments, setComments] = useState<Comment[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,6 +50,15 @@ function PendingBountyAudioCard({
   const handlePayReward = (selectedUser: string) => {
     alert(`Reward paid to ${selectedUser}`);
     // Implement logic for paying the reward to the selected user.
+  };
+
+  const formatBountyAmount = (amount: string) => {
+    try {
+      return `${formatEther(BigInt(amount))} ETH`;
+    } catch (error) {
+      console.error("Error formatting bounty amount:", error);
+      return "0 ETH";
+    }
   };
 
   const formatTimestamp = (timestamp: number): string => {
@@ -74,6 +84,7 @@ function PendingBountyAudioCard({
           throw new Error("Failed to fetch comments");
         }
         const data = await response.json();
+        console.log(data, "comment");
         setComments(data.comments);
       } catch (error) {
         console.error("Error fetching comments:", error);
@@ -104,7 +115,10 @@ function PendingBountyAudioCard({
       <div className="flex space-x-4">
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
-            Amount: <span className="font-semibold">{bountyAmount} ETH</span>
+            Amount:{" "}
+            <span className="font-semibold">
+              {formatBountyAmount(bountyAmount)}
+            </span>
           </p>
         </div>
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
@@ -127,7 +141,7 @@ function PendingBountyAudioCard({
         isVisible={isPopupVisible}
         onClose={togglePopup}
         onPayReward={handlePayReward}
-        bountyAmount="0.05 ETH"
+        bountyAmount={formatBountyAmount(bountyAmount)}
         totalResponses={responseCount}
         comments={comments}
         postId={postId}

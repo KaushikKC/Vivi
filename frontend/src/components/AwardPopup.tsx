@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import Image from "next/image";
 import AudioPlayer from "./AudioPlayer";
@@ -9,6 +9,7 @@ import { abi } from "@/constants/abi";
 import { useAccount, useWriteContract } from "wagmi";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { formatEther } from "viem";
 
 interface Comment {
   _id: string;
@@ -34,7 +35,7 @@ interface AwardPopupProps {
   onPayReward: (selectedUser: string) => void;
   bountyAmount: string; // The bounty amount passed as a prop
   totalResponses: number; // The total responses count passed as a prop
-  comments: Comment | undefined;
+  comments: Comment[];
   postId: number;
 }
 
@@ -46,15 +47,29 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
   comments,
   postId,
 }) => {
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isProcessing, setIsProcessing] = useState(false);
   const { writeContract } = useWriteContract();
   const { address } = useAccount();
+  const [selectedComment, setSelectedComment] = useState<{
+    id: string;
+    address: string;
+  } | null>(null);
 
-  const handleCommentClick = (username: string) => {
-    // Toggle the selection state for the comment
-    setSelectedUser(username === selectedUser ? null : username);
+  // Update handleCommentClick to use comment id and address
+  const handleCommentClick = (commentId: string, userAddress: string) => {
+    setSelectedComment((prev) =>
+      prev?.id === commentId ? null : { id: commentId, address: userAddress }
+    );
+  };
+
+  const formatBountyAmount = (amount: string) => {
+    try {
+      return `${formatEther(BigInt(amount))} ETH`;
+    } catch (error) {
+      console.error("Error formatting bounty amount:", error);
+      return "0 ETH";
+    }
   };
 
   const truncateAddress = (address: string) => {
@@ -62,37 +77,59 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
-  // Function to convert voice data to audio URL
+  // Add useEffect for cleanup
+  useEffect(() => {
+    const audioUrls: string[] = [];
+
+    // Cleanup function to revoke object URLs
+    return () => {
+      audioUrls.forEach((url) => {
+        if (url) URL.revokeObjectURL(url);
+      });
+    };
+  }, []);
+
+  // Modified getAudioUrl function
   const getAudioUrl = (comment: Comment): string | undefined => {
-    if (!comment.content?.voice?.data) return undefined;
-
     try {
-      // Check if the data is already a string or needs conversion
-      const base64String =
-        typeof comment.content.voice.data === "object"
-          ? Buffer.from(comment.content.voice.data).toString("base64")
-          : comment.content.voice.data;
+      if (comment.content?.voice?.data) {
+        // For Buffer data
+        if (Buffer.isBuffer(comment.content.voice.data)) {
+          const base64String = comment.content.voice.data.toString("base64");
+          const blob = new Blob([Buffer.from(base64String, "base64")], {
+            type: "audio/wav",
+          });
+          return URL.createObjectURL(blob);
+        }
 
-      // Create blob from base64
-      const byteCharacters = Buffer.from(base64String, "base64").toString(
-        "binary"
-      );
-      const byteNumbers = new Array(byteCharacters.length);
-
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+        // For base64 string data
+        if (typeof comment.content.voice.data === "string") {
+          // Remove data URL prefix if present
+          const base64Data = comment.content.voice.data.replace(
+            /^data:audio\/\w+;base64,/,
+            ""
+          );
+          const blob = new Blob([Buffer.from(base64Data, "base64")], {
+            type: "audio/wav",
+          });
+          return URL.createObjectURL(blob);
+        }
       }
 
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: "audio/wav" });
-      return URL.createObjectURL(blob);
+      // Fallback to contentHash if available
+      if (comment.contentHash) {
+        return comment.contentHash;
+      }
+
+      return undefined;
     } catch (error) {
       console.error("Error creating audio URL:", error);
-      return undefined; // Return undefined instead of null on error
+      return undefined;
     }
   };
+
   const handlePayReward = async () => {
-    if (!selectedUser) {
+    if (!selectedComment) {
       toast.error("Please select a user to pay the reward");
       return;
     }
@@ -111,7 +148,7 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
           address: contractAddress,
           abi: abi,
           functionName: "awardBounty",
-          args: [BigInt(postId), selectedUser],
+          args: [BigInt(postId), selectedComment.address],
         },
         {
           onSuccess: async () => {
@@ -120,7 +157,7 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
               const apiResponse = await axios.post(
                 `https://vivi-backend.vercel.app/api/posts/${postId}/pay-bounty`,
                 {
-                  recipientAddress: selectedUser,
+                  recipientAddress: selectedComment.address,
                 },
                 {
                   headers: {
@@ -184,7 +221,9 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
             </p>
             <p className="text-sm text-gray-400">
               Bounty Amount:{" "}
-              <span className="font-semibold">{bountyAmount} ETH</span>
+              <span className="font-semibold">
+                {formatBountyAmount(bountyAmount)}
+              </span>
             </p>
           </div>
         </div>
@@ -193,19 +232,20 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
         <div className="border-t border-gray-600 mt-6 pt-6">
           <div className="space-y-4">
             {comments &&
-              [comments].map((comment: Comment) => (
+              comments.map((comment: Comment) => (
                 <div
                   key={comment._id}
                   className={`flex items-start space-x-3 p-3 rounded-xl cursor-pointer transition-colors duration-300 
-                  ${
-                    selectedUser === comment.creatorAddress
-                      ? "bg-gray-600 border-2 border-[#9F62ED]"
-                      : "hover:bg-gray-700"
-                  }`}
-                  onClick={() => handleCommentClick(comment.creatorAddress)}
+                ${
+                  selectedComment?.id === comment._id
+                    ? "bg-gray-600 border-2 border-[#9F62ED]"
+                    : "hover:bg-gray-700"
+                }`}
+                  onClick={() =>
+                    handleCommentClick(comment._id, comment.creatorAddress)
+                  }
                 >
-                  {/* Checkmark icon */}
-                  {selectedUser === comment.creatorAddress && (
+                  {selectedComment?.id === comment._id && (
                     <div className="w-5 h-5 bg-[#9F62ED] rounded-full flex items-center justify-center">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -221,7 +261,6 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
                       </svg>
                     </div>
                   )}
-                  {/* Comment Content */}
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gray-700 rounded-full overflow-hidden">
                       <Image
@@ -234,7 +273,6 @@ const AwardPopup: React.FC<AwardPopupProps> = ({
                       <h4 className="font-semibold text-white">
                         {truncateAddress(comment.creatorAddress)}
                       </h4>
-                      {/* Conditionally render Audio Player or Comment */}
                       {comment.commentType === "VOICE" ? (
                         <AudioPlayer
                           audioUrl={getAudioUrl(comment)}

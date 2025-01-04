@@ -30,7 +30,6 @@ function CommentAudioCard({ comment }: CommentAudioCardProps) {
   const [isDisliked, setIsDisliked] = useState(false);
   const [userData, setUserData] = useState<UserData>({ name: "Anonymous" });
   const [audioUrl, setAudioUrl] = useState<string>("");
-  console.log(audioUrl, "audio");
 
   useEffect(() => {
     const fetchUserData = async () => {

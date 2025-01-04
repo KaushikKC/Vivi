@@ -41,6 +41,7 @@ interface Post {
   timestamp: number;
   createdAt: string;
   updatedAt: string;
+  hasBounty: boolean;
 }
 
 const Profile: React.FC = () => {
@@ -253,6 +254,7 @@ const Profile: React.FC = () => {
                     timestamp={post.timestamp}
                     postId={post.postId}
                     id={post._id}
+                    hasBounty={post.hasBounty}
                   />
                 );
               } catch (error) {
@@ -264,6 +266,7 @@ const Profile: React.FC = () => {
                     timestamp={post.timestamp}
                     postId={post.postId}
                     id={post._id}
+                    hasBounty={post.hasBounty}
                   />
                 );
               }
@@ -275,6 +278,7 @@ const Profile: React.FC = () => {
                   timestamp={post.timestamp}
                   postId={post.postId}
                   id={post._id}
+                  hasBounty={post.hasBounty}
                 />
               );
             }

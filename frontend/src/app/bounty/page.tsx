@@ -144,6 +144,7 @@ const Bounty: React.FC = () => {
                       timestamp={post.timestamp}
                       postId={post.postId}
                       bountyAmount={post.bountyAmount}
+                      responseCount={post.commentCount}
                     />
                   ) : (
                     <PendingBountyTextCard
