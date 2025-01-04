@@ -23,6 +23,7 @@ interface AudioCardProps {
   dislikes: string[];
   commentCount: number;
   postId: number;
+  isProcessing?: boolean;
 }
 
 const AudioCard: React.FC<AudioCardProps> = ({
@@ -34,6 +35,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
   dislikes,
   commentCount,
   postId,
+  isProcessing,
 }) => {
   const [userData, setUserData] = useState<{
     name: string;
@@ -171,7 +173,14 @@ const AudioCard: React.FC<AudioCardProps> = ({
         <Image src={close} alt="Close icon" className="h-5 w-5" />
       </div>
       <div className="my-3">
-        <AudioPlayer audioUrl={audioUrl} />
+        {isProcessing ? (
+          <div className="flex items-center justify-center p-4">
+            <div className="animate-pulse">Processing audio...</div>
+          </div>
+        ) : (
+          // Your existing audio player component
+          <AudioPlayer audioUrl={audioUrl} />
+        )}
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
