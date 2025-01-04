@@ -1,8 +1,6 @@
 "use client";
 
-import Image from "next/image";
 import React from "react";
-import avatar from "../images/avatar.png";
 import AudioPlayer from "./AudioPlayer";
 import { formatEther } from "viem";
 
@@ -84,11 +82,6 @@ function ClosedBountyAudioCard({
         <p className="text-gray-400 text-sm font-medium ">Rewarded User:</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image
-              src={avatar}
-              alt=""
-              className="w-10 h-10 bg-gray-700 rounded-full"
-            />
             <div>
               <h3 className="text-[16px] font-semibold">
                 {truncateAddress(rewardedAddress)}
