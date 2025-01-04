@@ -42,6 +42,7 @@ function ViewTextCard({
 
     setIsProcessing(true);
     toast.loading("Processing bounty transaction...", { id: "bounty" });
+
     try {
       // Call smart contract
       writeContract(
@@ -70,7 +71,7 @@ function ViewTextCard({
                 }
               );
 
-              if (apiResponse.data.success) {
+              if (apiResponse.data.status === "success") {
                 // Reset and close modal
                 setBountyAmount("0.005");
                 setShowBountyModal(false);
