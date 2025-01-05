@@ -543,8 +543,11 @@ const Dashboard: React.FC = () => {
                         audioContextRef.current = new AudioContext();
                         const audioContext = audioContextRef.current;
 
-                        // Convert Uint8Array to ArrayBuffer properly
-                        const arrayBuffer = byteArray.buffer.slice(0);
+                        // Create a new ArrayBuffer and copy the data
+                        const arrayBuffer = new ArrayBuffer(byteArray.length);
+                        const view = new Uint8Array(arrayBuffer);
+                        view.set(byteArray);
+
                         const audioBuffer = await audioContext.decodeAudioData(
                           arrayBuffer
                         );
