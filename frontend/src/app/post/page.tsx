@@ -62,6 +62,7 @@ const Dashboard: React.FC = () => {
   const audioChunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { address } = useAccount();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [avatarUrl, setAvatarUrl] = useState<string | StaticImageData>(avatar);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
@@ -153,22 +154,23 @@ const Dashboard: React.FC = () => {
     fetchUserProfile();
   }, [address]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get(
-          "https://vivi-backend.vercel.app/api/posts"
-        );
-        if (response.status) {
-          setPosts(response.data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching posts:", error);
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get(
+        "https://vivi-backend.vercel.app/api/posts"
+      );
+      if (response.status) {
+        setPosts(response.data.data);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      toast.error("Failed to fetch posts");
+    }
+  };
 
+  useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [refreshTrigger]);
 
   const uploadToIPFS = async (file: File | Blob | string) => {
     try {
@@ -301,7 +303,8 @@ const Dashboard: React.FC = () => {
                 setSelectedImage(null);
                 setPostType("text");
                 setIsAnonymous(false);
-
+                setRefreshTrigger((prev) => prev + 1);
+                await fetchPosts();
                 toast.success("Post created successfully!");
               }
             } catch (error) {

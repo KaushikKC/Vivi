@@ -356,7 +356,7 @@ function Details() {
                 setIsAnonymous(false);
                 toast.success("Comment added successfully!", { id: "comment" });
                 // Optionally refresh comments
-                // await fetchComments();
+                await fetchComments();
               }
             } catch (error) {
               console.error("Error saving to backend:", error);
