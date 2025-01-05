@@ -248,7 +248,7 @@ const TextCard: React.FC<TextCardProps> = ({
                 isLiked ? "text-blue-500" : "text-gray-400"
               }`}
             />
-            <span className="text-white">{likes.length}</span>
+            <span className="text-white">{likesCount}</span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
@@ -256,7 +256,7 @@ const TextCard: React.FC<TextCardProps> = ({
                 isDisliked ? "text-red-500" : "text-gray-400"
               }`}
             />
-            <span className="text-white">{dislikes.length}</span>
+            <span className="text-white">{dislikesCount}</span>
           </button>
           <div className="flex items-center gap-1">
             <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
