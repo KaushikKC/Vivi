@@ -542,11 +542,14 @@ const Dashboard: React.FC = () => {
                       try {
                         audioContextRef.current = new AudioContext();
                         const audioContext = audioContextRef.current;
+
+                        // Convert Uint8Array to ArrayBuffer properly
+                        const arrayBuffer = byteArray.buffer.slice(0);
                         const audioBuffer = await audioContext.decodeAudioData(
-                          byteArray.buffer
+                          arrayBuffer
                         );
 
-                        // Create nodes
+                        // Rest of your audio processing code...
                         const source = audioContext.createBufferSource();
                         source.buffer = audioBuffer;
 
