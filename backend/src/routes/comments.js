@@ -192,4 +192,38 @@ router.post("/:id/reaction", async (req, res) => {
   }
 });
 
+// Get reactions count for a post or comment
+router.get("/:id/reactions", async (req, res) => {
+  try {
+    const { isPost } = req.query;
+    const id = req.params.id;
+
+    const Model = isPost === "true" ? Post : Comment;
+    const item = await Model.findById(id);
+
+    if (!item) {
+      return res.status(404).json({
+        status: "error",
+        message: isPost === "true" ? "Post not found" : "Comment not found",
+      });
+    }
+
+    // Return current reaction counts and status
+    res.json({
+      status: "success",
+      likes: item.likes.length,
+      dislikes: item.dislikes.length,
+      // Optional: Include arrays of addresses for verification
+      likedBy: item.likes,
+      dislikedBy: item.dislikes,
+    });
+  } catch (error) {
+    console.error("Error fetching reactions:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
 module.exports = router;

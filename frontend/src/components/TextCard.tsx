@@ -104,6 +104,39 @@ const TextCard: React.FC<TextCardProps> = ({
     }
   }, [address, likes, dislikes]);
 
+  useEffect(() => {
+    if (address) {
+      const storedReaction = localStorage.getItem(`reaction-${_id}-${address}`);
+      if (storedReaction) {
+        const { isLiked: storedLiked, isDisliked: storedDisliked } =
+          JSON.parse(storedReaction);
+        setIsLiked(storedLiked);
+        setIsDisliked(storedDisliked);
+      }
+    }
+  }, [_id, address]);
+
+  const fetchCurrentReactions = async () => {
+    try {
+      const response = await axios.get(
+        `https://vivi-backend.vercel.app/api/comments/${_id}/reactions?isPost=${"true"}`
+      );
+      if (response.data.status === "success") {
+        setLikesCount(response.data.likes);
+        setDislikesCount(response.data.dislikes);
+      }
+    } catch (error) {
+      console.error("Error fetching reactions:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentReactions();
+    const interval = setInterval(fetchCurrentReactions, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [_id]);
+
   const handleReaction = async (type: "like" | "dislike") => {
     if (!address) {
       alert("Please connect your wallet");
@@ -139,12 +172,30 @@ const TextCard: React.FC<TextCardProps> = ({
         setDislikesCount(response.data.dislikes);
 
         if (type === "like") {
+          setLikesCount((prev) => prev + (isLiked ? -1 : 1));
           setIsLiked(!isLiked);
-          if (isDisliked) setIsDisliked(false);
+          if (isDisliked) {
+            setDislikesCount((prev) => prev - 1);
+            setIsDisliked(false);
+          }
         } else {
+          setDislikesCount((prev) => prev + (isDisliked ? -1 : 1));
           setIsDisliked(!isDisliked);
-          if (isLiked) setIsLiked(false);
+          if (isLiked) {
+            setLikesCount((prev) => prev - 1);
+            setIsLiked(false);
+          }
         }
+
+        // Store reaction state in localStorage
+        localStorage.setItem(
+          `reaction-${_id}-${address}`,
+          JSON.stringify({
+            isLiked: type === "like" ? !isLiked : false,
+            isDisliked: type === "dislike" ? !isDisliked : false,
+            timestamp: Date.now(),
+          })
+        );
       }
     } catch (error) {
       console.error(`Error ${type}ing post:`, error);
