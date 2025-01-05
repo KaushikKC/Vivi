@@ -83,11 +83,45 @@ const AudioCard: React.FC<AudioCardProps> = ({
   }, [creatorAddress]);
 
   useEffect(() => {
+    // Check if user has already liked/disliked
     if (address) {
       setIsLiked(likes.includes(address));
       setIsDisliked(dislikes.includes(address));
     }
-  }, [likes, dislikes, address]);
+  }, [address, likes, dislikes]);
+
+  useEffect(() => {
+    if (address) {
+      const storedReaction = localStorage.getItem(`reaction-${_id}-${address}`);
+      if (storedReaction) {
+        const { isLiked: storedLiked, isDisliked: storedDisliked } =
+          JSON.parse(storedReaction);
+        setIsLiked(storedLiked);
+        setIsDisliked(storedDisliked);
+      }
+    }
+  }, [_id, address]);
+
+  const fetchCurrentReactions = async () => {
+    try {
+      const response = await axios.get(
+        `https://vivi-backend.vercel.app/api/comments/${_id}/reactions?isPost=${"true"}`
+      );
+      if (response.data.status === "success") {
+        setLikesCount(response.data.likes);
+        setDislikesCount(response.data.dislikes);
+      }
+    } catch (error) {
+      console.error("Error fetching reactions:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentReactions();
+    const interval = setInterval(fetchCurrentReactions, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [_id]);
 
   const formatDate = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -134,12 +168,30 @@ const AudioCard: React.FC<AudioCardProps> = ({
         setDislikesCount(response.data.dislikes);
 
         if (type === "like") {
+          setLikesCount((prev) => prev + (isLiked ? -1 : 1));
           setIsLiked(!isLiked);
-          if (isDisliked) setIsDisliked(false);
+          if (isDisliked) {
+            setDislikesCount((prev) => prev - 1);
+            setIsDisliked(false);
+          }
         } else {
+          setDislikesCount((prev) => prev + (isDisliked ? -1 : 1));
           setIsDisliked(!isDisliked);
-          if (isLiked) setIsLiked(false);
+          if (isLiked) {
+            setLikesCount((prev) => prev - 1);
+            setIsLiked(false);
+          }
         }
+
+        // Store reaction state in localStorage
+        localStorage.setItem(
+          `reaction-${_id}-${address}`,
+          JSON.stringify({
+            isLiked: type === "like" ? !isLiked : false,
+            isDisliked: type === "dislike" ? !isDisliked : false,
+            timestamp: Date.now(),
+          })
+        );
       }
     } catch (error) {
       console.error(`Error ${type}ing post:`, error);
@@ -190,7 +242,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
                 isLiked ? "text-blue-500" : "text-gray-400"
               }`}
             />
-            <span className="text-white">{likes.length}</span>
+            <span className="text-white">{likesCount}</span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
@@ -198,7 +250,7 @@ const AudioCard: React.FC<AudioCardProps> = ({
                 isDisliked ? "text-red-500" : "text-gray-400"
               }`}
             />
-            <span className="text-white">{dislikes.length}</span>
+            <span className="text-white">{dislikesCount}</span>
           </button>
           <div className="flex items-center gap-1">
             <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
