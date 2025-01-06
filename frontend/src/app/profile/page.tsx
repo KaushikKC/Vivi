@@ -50,10 +50,17 @@ const Profile: React.FC = () => {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | StaticImageData>(avatar);
+  const [isLoading, setIsLoading] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<Post[]>([]);
   const [postCount, setPostCount] = useState(0);
+
+  const Spinner: React.FC = () => (
+    <div className="flex justify-center items-center h-full mt-5">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+    </div>
+  );
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -93,6 +100,8 @@ const Profile: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching user posts:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -218,51 +227,68 @@ const Profile: React.FC = () => {
           <p className="cursor-pointer hover:underline">See all</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {posts.map((post) => {
-            if (post.postType === "VOICE") {
-              let newaudioUrl;
-              try {
-                if (post.content?.voice?.data) {
-                  // Check if the data is already a string or needs conversion
-                  const base64String =
-                    typeof post.content.voice.data === "object"
-                      ? Buffer.from(post.content.voice.data).toString("base64")
-                      : post.content.voice.data;
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            posts.map((post) => {
+              if (post.postType === "VOICE") {
+                let newaudioUrl;
+                try {
+                  if (post.content?.voice?.data) {
+                    // Check if the data is already a string or needs conversion
+                    const base64String =
+                      typeof post.content.voice.data === "object"
+                        ? Buffer.from(post.content.voice.data).toString(
+                            "base64"
+                          )
+                        : post.content.voice.data;
 
-                  // Create blob from base64
-                  const byteCharacters = Buffer.from(
-                    base64String,
-                    "base64"
-                  ).toString("binary");
-                  const byteNumbers = new Array(byteCharacters.length);
+                    // Create blob from base64
+                    const byteCharacters = Buffer.from(
+                      base64String,
+                      "base64"
+                    ).toString("binary");
+                    const byteNumbers = new Array(byteCharacters.length);
 
-                  for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                      byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: "audio/wav" });
+                    newaudioUrl = URL.createObjectURL(blob);
+                  } else if (post.contentHash) {
+                    newaudioUrl = post.contentHash;
                   }
 
-                  const byteArray = new Uint8Array(byteNumbers);
-                  const blob = new Blob([byteArray], { type: "audio/wav" });
-                  newaudioUrl = URL.createObjectURL(blob);
-                } else if (post.contentHash) {
-                  newaudioUrl = post.contentHash;
+                  return (
+                    <ViewAudioCard
+                      key={post._id}
+                      audioUrl={newaudioUrl}
+                      timestamp={post.timestamp}
+                      postId={post.postId}
+                      id={post._id}
+                      hasBounty={post.hasBounty}
+                    />
+                  );
+                } catch (error) {
+                  console.error("Error converting audio data:", error);
+                  return (
+                    <ViewAudioCard
+                      key={post._id}
+                      audioUrl={post.contentHash}
+                      timestamp={post.timestamp}
+                      postId={post.postId}
+                      id={post._id}
+                      hasBounty={post.hasBounty}
+                    />
+                  );
                 }
-
+              } else {
                 return (
-                  <ViewAudioCard
+                  <ViewTextCard
                     key={post._id}
-                    audioUrl={newaudioUrl}
-                    timestamp={post.timestamp}
-                    postId={post.postId}
-                    id={post._id}
-                    hasBounty={post.hasBounty}
-                  />
-                );
-              } catch (error) {
-                console.error("Error converting audio data:", error);
-                return (
-                  <ViewAudioCard
-                    key={post._id}
-                    audioUrl={post.contentHash}
+                    content={post.content || ""}
                     timestamp={post.timestamp}
                     postId={post.postId}
                     id={post._id}
@@ -270,19 +296,8 @@ const Profile: React.FC = () => {
                   />
                 );
               }
-            } else {
-              return (
-                <ViewTextCard
-                  key={post._id}
-                  content={post.content || ""}
-                  timestamp={post.timestamp}
-                  postId={post.postId}
-                  id={post._id}
-                  hasBounty={post.hasBounty}
-                />
-              );
-            }
-          })}
+            })
+          )}
         </div>
       </main>
     </div>
