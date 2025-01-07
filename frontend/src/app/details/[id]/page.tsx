@@ -427,7 +427,9 @@ function Details() {
       <main className="p-4 max-w-3xl mx-auto">
         {/* Display original post */}
         {post && (
-          <section className="bg-gray-800 p-5 rounded-lg mb-6">
+          <section className="bg-gray-800 p-5 rounded-lg mb-6" style={{
+            boxShadow: "2px 4px 6px rgba(163, 187, 212, 0.3)" /* Blue shadow */
+          }}>
             <div className="flex items-center gap-3 mb-4">
               <Image
                 src={userData.profilePicture || avatar}
@@ -463,120 +465,120 @@ function Details() {
           </section>
         )}
 
-        <section className="mt-6 bg-gray-800 p-5 rounded-lg">
-          <h2 className="text-2xl font-zenDots mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8]">
-            Comments
-          </h2>
-          <div className="flex items-start gap-3 my-2">
-            <Image
-              src={currentUserData.profilePicture || avatar}
-              alt=""
-              className="border-2 border-white h-12 w-12 rounded-full"
-              width={20}
-              height={20}
-            />
-            <div className="flex-1 flex gap-3">
-              <textarea
-                className="flex-1 bg-gray-700 text-white p-2 rounded-md focus:outline-none focus:ring"
-                placeholder="Add your comments"
-                rows={2}
-                value={comment} // Add this
-                onChange={(e) => setComment(e.target.value)}
-              />
-              <button
-                onClick={handleAddComment}
-                className="text-[16px] font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200 whitespace-nowrap"
-              >
-                Add Comment
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-between ">
-              <div className="flex items-center gap-4 ">
-                {/* Post Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    className="text-[16px] bg-gray-800 p-3 rounded-xl flex items-center gap-2 transition-colors border border-[#7482F1]"
-                  >
-                    {postType === "audio" ? (
-                      <>
-                        <FaMicrophone className="text-purple-400" />
-                        <span>Post as Audio</span>
-                      </>
-                    ) : (
-                      <>
-                        <LuMessageSquareText className="text-green-400" />
-                        <span>Post as Text</span>
-                      </>
-                    )}
-                    <IoMdArrowDropdown className="text-white" />
-                  </button>
-                  {showDropdown && (
-                    <div className="absolute top-full mt-2 bg-gray-800 rounded shadow-lg w-40 z-10">
-                      <div
-                        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
-                        onClick={() => handlePostTypeSelect("audio")}
-                      >
-                        <FaMicrophone className="text-purple-400" />
-                        <span>Post as Audio</span>
-                      </div>
-                      <div
-                        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
-                        onClick={() => handlePostTypeSelect("text")}
-                      >
-                        <LuMessageSquareText className="text-green-400" />
-                        <span>Post as Text</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Microphone Button */}
-                <div className="flex justify-center items-center gap-2">
-                  <div
-                    className={`bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer ${
-                      isRecording ? "opacity-70" : "hover:opacity-90"
-                    }`}
-                    onClick={handleRecordClick}
-                  >
-                    <FaMicrophone className="h-9 w-9 text-white p-2" />
-                  </div>
-                  {isRecording && (
-                    <span className="text-red-500 flex items-center gap-2 ">
-                      <span className="animate-pulse h-2 w-2 rounded-full bg-red-500"></span>
-                      Recording...
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <label
-                  className={`relative inline-block w-12 h-6 cursor-pointer ${
-                    isAnonymous ? "bg-blue-600" : "bg-gray-700"
-                  } rounded-full transition-colors`}
-                >
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={isAnonymous}
-                    onChange={() => setIsAnonymous(!isAnonymous)}
-                  />
-                  <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform transform peer-checked:translate-x-6" />
-                </label>
-                <span className="text-sm text-white">
-                  {isAnonymous ? "Go Incognito" : "Go Public"}
-                </span>
-              </div>
-            </div>
-            {audioUrl && (
-              <div className="w-full bg-gray-700/50 rounded-lg p-2">
-                <AudioPlayer audioUrl={audioUrl} />
-              </div>
+<section className="mt-6 bg-gray-800 p-5 rounded-lg shadow-[0_4px_20px_0] shadow-purple-500/20 hover:shadow-[0_8px_30px_0] hover:shadow-blue-500/20 transition-all duration-300 animate-fadeIn">
+  <h2 className="text-2xl font-zenDots mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8] animate-slideIn">
+    Comments
+  </h2>
+  <div className="flex items-start gap-3 my-2">
+    <Image
+      src={currentUserData.profilePicture || avatar}
+      alt=""
+      className="border-2 border-white h-12 w-12 rounded-full hover:scale-110 transition-transform duration-300 hover:border-purple-400"
+      width={20}
+      height={20}
+    />
+    <div className="flex-1 flex gap-3">
+      <textarea
+        className="flex-1 bg-gray-700 text-white p-2 rounded-md focus:outline-none focus:ring focus:ring-purple-500/50 transition-all duration-200 hover:bg-gray-700/80"
+        placeholder="Add your comments"
+        rows={2}
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+      />
+      <button
+        onClick={handleAddComment}
+        className="text-[16px] font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 whitespace-nowrap transform hover:-translate-y-1"
+      >
+        Add Comment
+      </button>
+    </div>
+  </div>
+  <div className="flex flex-col space-y-4">
+    <div className="flex items-center justify-between animate-slideIn">
+      <div className="flex items-center gap-4">
+        {/* Post Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="text-[16px] bg-gray-800 p-3 rounded-xl flex items-center gap-2 transition-all duration-300 border border-[#7482F1] hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 group"
+          >
+            {postType === "audio" ? (
+              <>
+                <FaMicrophone className="text-purple-400 group-hover:animate-bounce" />
+                <span>Post as Audio</span>
+              </>
+            ) : (
+              <>
+                <LuMessageSquareText className="text-green-400 group-hover:animate-pulse" />
+                <span>Post as Text</span>
+              </>
             )}
+            <IoMdArrowDropdown className="text-white transition-transform duration-200 group-hover:rotate-180" />
+          </button>
+          {showDropdown && (
+            <div className="absolute top-full mt-2 bg-gray-800 rounded shadow-lg w-40 z-10 animate-slideDown">
+              <div
+                className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-all duration-200 hover:translate-x-1"
+                onClick={() => handlePostTypeSelect("audio")}
+              >
+                <FaMicrophone className="text-purple-400" />
+                <span>Post as Audio</span>
+              </div>
+              <div
+                className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-all duration-200 hover:translate-x-1"
+                onClick={() => handlePostTypeSelect("text")}
+              >
+                <LuMessageSquareText className="text-green-400" />
+                <span>Post as Text</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Microphone Button */}
+        <div className="flex justify-center items-center gap-2">
+          <div
+            className={`bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-110 ${
+              isRecording ? "opacity-70" : "hover:opacity-90"
+            }`}
+            onClick={handleRecordClick}
+          >
+            <FaMicrophone className="h-9 w-9 text-white p-2" />
           </div>
-        </section>
+          {isRecording && (
+            <span className="text-red-500 flex items-center gap-2 animate-fadeIn">
+              <span className="animate-pulse h-2 w-2 rounded-full bg-red-500"></span>
+              Recording...
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <label
+          className={`relative inline-block w-12 h-6 cursor-pointer ${
+            isAnonymous ? "bg-blue-600" : "bg-gray-700"
+          } rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20`}
+        >
+          <input
+            type="checkbox"
+            className="sr-only peer"
+            checked={isAnonymous}
+            onChange={() => setIsAnonymous(!isAnonymous)}
+          />
+          <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 transform peer-checked:translate-x-6" />
+        </label>
+        <span className="text-sm text-white">
+          {isAnonymous ? "Go Incognito" : "Go Public"}
+        </span>
+      </div>
+    </div>
+    {audioUrl && (
+      <div className="w-full bg-gray-700/50 rounded-lg p-2 animate-slideIn transform hover:scale-[1.02] transition-transform duration-300">
+        <AudioPlayer audioUrl={audioUrl} />
+      </div>
+    )}
+  </div>
+</section>
         {/* Replace the existing comment cards with this */}
         <div className="space-y-4">
           {comments?.map((comment) => {

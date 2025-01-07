@@ -29,29 +29,32 @@ const CommentTextCard: React.FC<CommentTextCardProps> = ({ comment }) => {
   const [isDisliked, setIsDisliked] = useState<boolean>(false);
   const [userData, setUserData] = useState<UserData>({ name: "Anonymous" });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (comment.isAnonymous) return;
+  useEffect(
+    () => {
+      const fetchUserData = async () => {
+        if (comment.isAnonymous) return;
 
-      try {
-        const response = await fetch(
-          `https://vivi-backend.vercel.app/api/users/profile/${comment.creatorAddress}`
-        );
-        const data = await response.json();
+        try {
+          const response = await fetch(
+            `https://vivi-backend.vercel.app/api/users/profile/${comment.creatorAddress}`
+          );
+          const data = await response.json();
 
-        if (data) {
-          setUserData({
-            name: data.name || "Anonymous",
-            profilePicture: data.profilePicture,
-          });
+          if (data) {
+            setUserData({
+              name: data.name || "Anonymous",
+              profilePicture: data.profilePicture
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
         }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+      };
 
-    fetchUserData();
-  }, [comment.creatorAddress, comment.isAnonymous]);
+      fetchUserData();
+    },
+    [comment.creatorAddress, comment.isAnonymous]
+  );
 
   const handleLike = (): void => {
     if (isLiked) {
@@ -86,12 +89,17 @@ const CommentTextCard: React.FC<CommentTextCardProps> = ({ comment }) => {
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
   return (
-    <section className="bg-gray-800 p-5 rounded-lg mt-4 max-w-3xl">
+    <section
+      className="bg-gray-800 p-5 rounded-lg mt-4 max-w-3xl"
+      style={{
+        boxShadow: "2px 4px 6px rgba(163, 187, 212, 0.3)" /* Blue shadow */
+      }}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Image
@@ -117,25 +125,31 @@ const CommentTextCard: React.FC<CommentTextCardProps> = ({ comment }) => {
         </div>
       </div>
       <div className="my-3">
-        <p className="text-[17px]">{comment.content}</p>
+        <p className="text-[17px]">
+          {comment.content}
+        </p>
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button onClick={handleLike} className="flex items-center gap-1">
             <FaThumbsUp
-              className={`h-5 w-5 ${
-                isLiked ? "text-blue-500" : "text-gray-400"
-              }`}
+              className={`h-5 w-5 ${isLiked
+                ? "text-blue-500"
+                : "text-gray-400"}`}
             />
-            <span className="text-white">{likes}</span>
+            <span className="text-white">
+              {likes}
+            </span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
-              className={`h-5 w-5 ${
-                isDisliked ? "text-red-500" : "text-gray-400"
-              }`}
+              className={`h-5 w-5 ${isDisliked
+                ? "text-red-500"
+                : "text-gray-400"}`}
             />
-            <span className="text-white">{dislikes}</span>
+            <span className="text-white">
+              {dislikes}
+            </span>
           </button>
           <FaReplyAll className="h-5 w-5 text-gray-400" />
         </div>

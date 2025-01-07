@@ -127,7 +127,9 @@ function ViewTextCard({
           },
         }}
       />
-      <section className="bg-gray-800 p-5 rounded-lg mt-4">
+      <section className="bg-gray-800 p-5 rounded-lg mt-4"   style={{
+        boxShadow: "2px 4px 6px rgba(163, 187, 212, 0.3)" /* Blue shadow */
+      }} >
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-400">
             Posted on {formatDate(timestamp)}

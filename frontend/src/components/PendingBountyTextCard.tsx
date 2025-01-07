@@ -37,7 +37,7 @@ function PendingBountyTextCard({
   timestamp,
   postId,
   bountyAmount, // Default value
-  responseCount = 0,
+  responseCount = 0
 }: PendingBountyTextCardProps) {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -50,7 +50,7 @@ function PendingBountyTextCard({
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
@@ -70,49 +70,58 @@ function PendingBountyTextCard({
   };
 
   // Fetch comments when popup is opened
-  useEffect(() => {
-    const fetchComments = async () => {
-      // if (isPopupVisible) {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `https://vivi-backend.vercel.app/api/comments/${postId}/comments`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch comments");
+  useEffect(
+    () => {
+      const fetchComments = async () => {
+        // if (isPopupVisible) {
+        setIsLoading(true);
+        try {
+          const response = await fetch(
+            `https://vivi-backend.vercel.app/api/comments/${postId}/comments`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch comments");
+          }
+          const data = await response.json();
+          setComments(data.comments);
+        } catch (error) {
+          console.error("Error fetching comments:", error);
+        } finally {
+          setIsLoading(false);
         }
-        const data = await response.json();
-        setComments(data.comments);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-      } finally {
-        setIsLoading(false);
-      }
-      // }
-    };
+        // }
+      };
 
-    fetchComments();
-  }, [isPopupVisible, postId]);
+      fetchComments();
+    },
+    [isPopupVisible, postId]
+  );
 
   // Toggle popup visibility
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
   return (
-    <section className="bg-gray-800 p-5 rounded-lg mt-4">
+    <section
+      className="bg-gray-800 p-5 rounded-lg mt-4"
+      style={{
+        boxShadow: "2px 4px 6px rgba(163, 187, 212, 0.3)" /* Blue shadow */
+      }}
+    >
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-400">
           Posted on {formatTimestamp(timestamp)}
         </p>
       </div>
       <div className="my-3">
-        <p className="text-[17px]">{content}</p>
+        <p className="text-[17px]">
+          {content}
+        </p>
       </div>
       <div className="flex space-x-4">
         <div className="bg-gray-600 w-fit px-3 rounded-xl ">
           <p className="text-white">
             Amount:{" "}
             <span className="font-semibold">
-              {" "}
-              {formatBountyAmount(bountyAmount)}
+              {" "}{formatBountyAmount(bountyAmount)}
             </span>
           </p>
         </div>

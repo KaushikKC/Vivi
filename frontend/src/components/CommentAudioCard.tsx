@@ -31,59 +31,65 @@ function CommentAudioCard({ comment }: CommentAudioCardProps) {
   const [userData, setUserData] = useState<UserData>({ name: "Anonymous" });
   const [audioUrl, setAudioUrl] = useState<string>("");
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (comment.isAnonymous) return;
+  useEffect(
+    () => {
+      const fetchUserData = async () => {
+        if (comment.isAnonymous) return;
 
-      try {
-        const response = await fetch(
-          `https://vivi-backend.vercel.app/api/users/profile/${comment.creatorAddress}`
-        );
-        const data = await response.json();
+        try {
+          const response = await fetch(
+            `https://vivi-backend.vercel.app/api/users/profile/${comment.creatorAddress}`
+          );
+          const data = await response.json();
 
-        if (data) {
-          setUserData({
-            name: data.name || "Anonymous",
-            profilePicture: data.profilePicture,
-          });
+          if (data) {
+            setUserData({
+              name: data.name || "Anonymous",
+              profilePicture: data.profilePicture
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
         }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+      };
 
-    fetchUserData();
-  }, [comment.creatorAddress, comment.isAnonymous]);
+      fetchUserData();
+    },
+    [comment.creatorAddress, comment.isAnonymous]
+  );
 
-  useEffect(() => {
-    const processAudioUrl = async () => {
-      try {
-        if (!comment.audioUrl) {
-          console.error("No audio URL provided");
-          return;
+  useEffect(
+    () => {
+      const processAudioUrl = async () => {
+        try {
+          if (!comment.audioUrl) {
+            console.error("No audio URL provided");
+            return;
+          }
+
+          if (comment.audioUrl.startsWith("blob:")) {
+            console.log("Using existing blob URL");
+            setAudioUrl(comment.audioUrl);
+          } else if (comment.audioUrl.startsWith("data:")) {
+            console.log("Using data URL");
+            setAudioUrl(comment.audioUrl);
+          } else {
+            console.log("Fetching from URL:", comment.audioUrl);
+            const response = await fetch(comment.audioUrl);
+            const blob = await response.blob();
+            console.log("Blob type:", blob.type); // Debug the MIME type
+            const blobUrl = URL.createObjectURL(blob);
+            setAudioUrl(blobUrl);
+          }
+        } catch (error) {
+          console.error("Error processing audio URL:", error);
         }
+      };
 
-        if (comment.audioUrl.startsWith("blob:")) {
-          console.log("Using existing blob URL");
-          setAudioUrl(comment.audioUrl);
-        } else if (comment.audioUrl.startsWith("data:")) {
-          console.log("Using data URL");
-          setAudioUrl(comment.audioUrl);
-        } else {
-          console.log("Fetching from URL:", comment.audioUrl);
-          const response = await fetch(comment.audioUrl);
-          const blob = await response.blob();
-          console.log("Blob type:", blob.type); // Debug the MIME type
-          const blobUrl = URL.createObjectURL(blob);
-          setAudioUrl(blobUrl);
-        }
-      } catch (error) {
-        console.error("Error processing audio URL:", error);
-      }
-    };
-
-    processAudioUrl();
-  }, [comment.audioUrl]);
+      processAudioUrl();
+    },
+    [comment.audioUrl]
+  );
 
   const handleLike = () => {
     if (isLiked) {
@@ -118,12 +124,17 @@ function CommentAudioCard({ comment }: CommentAudioCardProps) {
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
   return (
-    <section className="bg-gray-800 p-5 rounded-lg mt-4">
+    <section
+      className="bg-gray-800 p-5 rounded-lg mt-4"
+      style={{
+        boxShadow: "2px 4px 6px rgba(163, 187, 212, 0.3)" /* Blue shadow */
+      }}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Image
@@ -157,19 +168,23 @@ function CommentAudioCard({ comment }: CommentAudioCardProps) {
         <div className="flex items-center gap-4">
           <button onClick={handleLike} className="flex items-center gap-1">
             <FaThumbsUp
-              className={`h-5 w-5 ${
-                isLiked ? "text-blue-500" : "text-gray-400"
-              }`}
+              className={`h-5 w-5 ${isLiked
+                ? "text-blue-500"
+                : "text-gray-400"}`}
             />
-            <span className="text-white">{likes}</span>
+            <span className="text-white">
+              {likes}
+            </span>
           </button>
           <button onClick={handleDislike} className="flex items-center gap-1">
             <FaThumbsDown
-              className={`h-5 w-5 ${
-                isDisliked ? "text-red-500" : "text-gray-400"
-              }`}
+              className={`h-5 w-5 ${isDisliked
+                ? "text-red-500"
+                : "text-gray-400"}`}
             />
-            <span className="text-white">{dislikes}</span>
+            <span className="text-white">
+              {dislikes}
+            </span>
           </button>
           <FaReplyAll className="h-5 w-5 text-gray-400" />
         </div>

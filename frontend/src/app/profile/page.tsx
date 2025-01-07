@@ -147,9 +147,9 @@ const Profile: React.FC = () => {
               <Image
                 src={avatarUrl}
                 alt="avatar"
-                width={30}
-                height={30}
-                className="border-2 border-white h-20 w-20 rounded-full object-cover"
+                width={20}
+                height={20}
+                className="border-2 border-white h-20 w-20 rounded-full object-fit"
               />
               {isEditing && (
                 <input

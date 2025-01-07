@@ -11,7 +11,7 @@ const AboutUs: React.FC = () => {
   return (
     <div className="bg-gradient-to-br from-[#204660] to-[#5E3C8B] min-h-screen text-white font-rajdhani relative overflow-hidden">
       {/* Top Bar */}
-      <div className="absolute flex justify-between w-full top-6">
+      <div className="absolute flex justify-between w-full top-6 animate-slideDown">
         {/* Logo */}
         <div className="left-0 flex items-center justify-start space-x-3 mr-5">
           <Link href="/">
@@ -28,12 +28,12 @@ const AboutUs: React.FC = () => {
       </div>
 
       {/* Navbar */}
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center animate-slideDown">
         <Navbar />
       </div>
 
       {/* Header */}
-      <header className="flex justify-center items-center py-16 px-4 relative z-10 animate-fadeIn">
+      <header className="flex justify-center items-center py-16 px-4 relative z-10 animate-slideIn">
         <Image
           src={logo}
           alt="Vivi Logo"
@@ -48,7 +48,7 @@ const AboutUs: React.FC = () => {
       <main className="p-8 max-w-5xl mx-auto relative z-10">
         {/* Introduction */}
         <section
-          className="mb-16 animate-fadeIn opacity-0"
+          className="mb-16 animate-slideIn"
           style={{ animationDelay: "0.4s" }}
         >
           <h2 className="text-2xl font-semibold mb-5 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8]">
@@ -64,7 +64,7 @@ const AboutUs: React.FC = () => {
 
         {/* Key Features */}
         <section
-          className="mb-16 animate-fadeIn opacity-0"
+          className="mb-16 animate-slideIn"
           style={{ animationDelay: "0.6s" }}
         >
           <h2 className="text-2xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8]">
@@ -76,39 +76,43 @@ const AboutUs: React.FC = () => {
                 title: "Voice-Activated Q&A",
                 description:
                   "Users can ask and answer questions using voice commands, making the platform more interactive and accessible.",
-                emoji: "🎤",
+                emoji: "🎤"
               },
               {
                 title: "Voice-to-Text Integration",
                 description:
                   "Our voice-to-text feature converts voice responses or questions into accurate text, providing a hands-free, accessible experience for users who prefer speaking over typing.",
-                emoji: "📝",
+                emoji: "📝"
               },
               {
                 title: "Decentralized Knowledge Sharing",
                 description:
                   "Vivi runs on a decentralized network, ensuring secure, private, and transparent data, giving users control over their knowledge and contributions.",
-                emoji: "🔗",
-              },
-            ].map((feature, index) => (
+                emoji: "🔗"
+              }
+            ].map((feature, index) =>
               <div
                 key={index}
-                className="bg-gray-800 p-8 rounded-3xl shadow-2xl hover:scale-105 hover:-rotate-3 transition-all duration-300 ease-in-out animate-fadeIn opacity-0"
+                className="bg-gray-800 p-8 rounded-3xl shadow-2xl transform hover:scale-[1.05] hover:rotate-2 transition-transform duration-300 ease-in-out animate-fadeIn"
                 style={{ animationDelay: `${0.7 + index * 0.2}s` }}
               >
-                <div className="text-2xl mb-4">{feature.emoji}</div>
+                <div className="text-2xl mb-4">
+                  {feature.emoji}
+                </div>
                 <h3 className="text-xl font-semibold mb-3 font-zenDots">
                   {feature.title}
                 </h3>
-                <p className="text-lg">{feature.description}</p>
+                <p className="text-lg">
+                  {feature.description}
+                </p>
               </div>
-            ))}
+            )}
           </div>
         </section>
 
         {/* Our Mission */}
         <section
-          className="mb-16 animate-fadeIn opacity-0"
+          className="mb-16 animate-slideIn"
           style={{ animationDelay: "1s" }}
         >
           <h2 className="text-2xl font-semibold mb-5 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8]">

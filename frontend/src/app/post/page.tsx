@@ -373,147 +373,136 @@ const Dashboard: React.FC = () => {
       {/* Main Section */}
       <main className="p-4 max-w-3xl mx-auto">
         {/* Create a New Post */}
-        <section className="mb-6 bg-gray-800 p-5 rounded-lg">
-          <h2 className="text-3xl font-zenDots mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8]">
-            Create a new Post
-          </h2>
+        <section className="mb-6 bg-gray-800 p-5 rounded-lg shadow-[0_4px_20px_0] shadow-purple-500/20 animate-fadeIn transition-all duration-300 hover:shadow-[0_8px_30px_0] hover:shadow-blue-500/20">
+  <h2 className="text-3xl font-zenDots mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#9F62ED] via-[#FFFFFF] to-[#3AAEF8] animate-slideIn">
+    Create a new Post
+  </h2>
 
-          <div className="flex my-2 space-x-3">
-            <Image
-              src={avatarUrl}
-              alt=""
-              height={20}
-              width={20}
-              className="border-2 border-white h-12 w-12 rounded-full"
-            />
-            <textarea
-              className="w-full bg-gray-700 text-white p-2 rounded-md mb-3 focus:outline-none focus:ring"
-              placeholder="What's on your mind?"
-              rows={3}
-              value={content} // Add this
-              onChange={(e) => setContent(e.target.value)} // Add this
-            />
-            <button
-              onClick={handlePost}
-              className="text-[18px] font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition duration-200"
-            >
-              Post
-            </button>
-          </div>
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-4">
-                {/* Post Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowDropdown(!showDropdown)}
-                    className="text-[16px] bg-gray-800 p-3 rounded-xl flex items-center gap-2 transition-colors border border-[#7482F1]"
-                  >
-                    {postType === "audio" ? (
-                      <>
-                        <FaMicrophone className="text-purple-400" />
-                        <span>Post as Audio</span>
-                      </>
-                    ) : (
-                      <>
-                        <LuMessageSquareText className="text-green-400" />
-                        <span>Post as Text</span>
-                      </>
-                    )}
-                    <IoMdArrowDropdown className="text-white" />
-                  </button>
-                  {showDropdown && (
-                    <div className="absolute top-full mt-2 bg-gray-800 rounded shadow-lg w-40 z-10">
-                      <div
-                        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
-                        onClick={() => handlePostTypeSelect("audio")}
-                      >
-                        <FaMicrophone className="text-purple-400" />
-                        <span>Post as Audio</span>
-                      </div>
-                      <div
-                        className="flex items-center gap-2 py-2 px-3 hover:bg-gray-700 cursor-pointer transition-colors"
-                        onClick={() => handlePostTypeSelect("text")}
-                      >
-                        <LuMessageSquareText className="text-green-400" />
-                        <span>Post as Text</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+  <div className="flex my-2 space-x-3">
+    <Image
+      src={avatarUrl}
+      alt=""
+      height={20}
+      width={20}
+      className="border-2 border-white h-12 w-12 rounded-full animate-pulse hover:scale-110 transition-transform duration-200"
+    />
+    <textarea
+      className="w-full bg-gray-700 text-white p-2 rounded-md mb-3 focus:outline-none focus:ring focus:ring-purple-500/50 transition-all duration-200"
+      placeholder="What's on your mind?"
+      rows={3}
+      value={content}
+      onChange={(e) => setContent(e.target.value)}
+    />
+    <button
+      onClick={handlePost}
+      className="text-[18px] font-semibold border border-[#7482F1] bg-transparent hover:bg-gradient-to-r from-purple-500 to-blue-500 focus:bg-gradient-to-r focus:from-purple-500 focus:to-blue-500 py-1 px-3 rounded-xl h-fit transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20"
+    >
+      Post
+    </button>
+  </div>
 
-                {/* Microphone Button */}
-                <div className="flex flex-col items-center">
-                  <div
-                    className={`bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer ${
-                      isRecording ? "opacity-70" : "hover:opacity-90"
-                    }`}
-                    onClick={handleRecordClick}
-                  >
-                    <FaMicrophone className="h-9 w-9 text-white p-2" />
-                  </div>
-                </div>
-
-                {/* Attach Image */}
-                <div
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer"
-                  onClick={handleImageClick}
-                >
-                  <IoMdImages className="h-9 w-9 text-white p-2" />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                </div>
-                {selectedImage && (
-                  <span className="text-sm text-gray-300 ml-[-10px]">
-                    {selectedImage.name} {/* Display file name */}
-                  </span>
-                )}
-              </div>
-
-              {/* Anonymous Toggle */}
-              <div className="flex items-center gap-2">
-                <label
-                  className={`relative inline-block w-12 h-6 cursor-pointer ${
-                    isAnonymous ? "bg-blue-600" : "bg-gray-700"
-                  } rounded-full transition-colors`}
-                >
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={isAnonymous}
-                    onChange={() => setIsAnonymous(!isAnonymous)}
-                  />
-                  <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform transform peer-checked:translate-x-6" />
-                </label>
-                <span className="text-sm text-white">
-                  {isAnonymous ? "Go Incognito" : "Go Public"}
-                </span>
-              </div>
+  <div className="flex flex-col space-y-4">
+    <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4">
+        {/* Post Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="text-[16px] bg-gray-800 p-3 rounded-xl flex items-center gap-2 transition-all duration-200 border border-[#7482F1] hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105"
+          >
+            {postType === "audio" ? (
+              <>
+                <FaMicrophone className="text-purple-400 animate-pulse" />
+                <span>Post as Audio</span>
+              </>
+            ) : (
+              <>
+                <LuMessageSquareText className="text-green-400" />
+                <span>Post as Text</span>
+              </>
+            )}
+            <IoMdArrowDropdown className="text-white transition-transform duration-200" />
+          </button>
+          {showDropdown && (
+            <div className="absolute top-full mt-2 bg-gray-800 rounded shadow-lg w-40 z-10 animate-slideDown">
+              {/* Dropdown items remain the same */}
             </div>
-            {isRecording && (
-              <span className="text-red-500 flex items-center gap-2 mt-2">
-                <span className="animate-pulse h-2 w-2 rounded-full bg-red-500"></span>
-                Recording...
-              </span>
-            )}
-            {audioUrl && (
-              <div className="w-full bg-gray-700/50 rounded-lg p-2">
-                <AudioPlayer audioUrl={audioUrl} />
-              </div>
-            )}
+          )}
+        </div>
+
+        {/* Microphone Button */}
+        <div className="flex flex-col items-center">
+          <div
+            className={`bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-110 ${
+              isRecording ? "opacity-70" : "hover:opacity-90"
+            }`}
+            onClick={handleRecordClick}
+          >
+            <FaMicrophone className="h-9 w-9 text-white p-2" />
           </div>
-        </section>
+        </div>
+
+        {/* Attach Image */}
+        <div
+          className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-110"
+          onClick={handleImageClick}
+        >
+          <IoMdImages className="h-9 w-9 text-white p-2" />
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        </div>
+        {selectedImage && (
+          <span className="text-sm text-gray-300 ml-[-10px] animate-fadeIn">
+            {selectedImage.name}
+          </span>
+        )}
+      </div>
+
+      {/* Anonymous Toggle */}
+      <div className="flex items-center gap-2">
+        <label
+          className={`relative inline-block w-12 h-6 cursor-pointer ${
+            isAnonymous ? "bg-blue-600" : "bg-gray-700"
+          } rounded-full transition-colors duration-300 hover:shadow-lg hover:shadow-blue-500/20`}
+        >
+          <input
+            type="checkbox"
+            className="sr-only peer"
+            checked={isAnonymous}
+            onChange={() => setIsAnonymous(!isAnonymous)}
+          />
+          <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 transform peer-checked:translate-x-6" />
+        </label>
+        <span className="text-sm text-white">
+          {isAnonymous ? "Go Incognito" : "Go Public"}
+        </span>
+      </div>
+    </div>
+    {isRecording && (
+      <span className="text-red-500 flex items-center gap-2 mt-2 animate-fadeIn">
+        <span className="animate-pulse h-2 w-2 rounded-full bg-red-500"></span>
+        Recording...
+      </span>
+    )}
+    {audioUrl && (
+      <div className="w-full bg-gray-700/50 rounded-lg p-2 animate-slideIn">
+        <AudioPlayer audioUrl={audioUrl} />
+      </div>
+    )}
+  </div>
+</section>
 
         {/* Posts */}
         <div className="space-y-4">
           {posts?.map((post) => {
             if (post.postType === "TEXT") {
               return (
+                
                 <TextCard
                   key={post._id}
                   _id={post._id}

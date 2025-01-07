@@ -21,7 +21,7 @@ function ClosedBountyAudioCard({
   timestamp,
   bountyAmount, // Default value
   responseCount = 0,
-  rewardedAddress,
+  rewardedAddress
 }: BountyAudioCardProps) {
   const formatTimestamp = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -29,7 +29,7 @@ function ClosedBountyAudioCard({
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
@@ -48,7 +48,12 @@ function ClosedBountyAudioCard({
   };
 
   return (
-    <section className="bg-gray-800 p-5 rounded-lg mt-4">
+    <section
+      className="bg-gray-800 p-5 rounded-lg mt-4"
+      style={{
+        boxShadow: "2px 4px 6px rgba(163, 187, 212, 0.3)" /* Blue shadow */
+      }}
+    >
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-400">
           Posted on {formatTimestamp(timestamp)}
@@ -64,8 +69,7 @@ function ClosedBountyAudioCard({
           <p className="text-white">
             Amount:{" "}
             <span className="font-semibold">
-              {" "}
-              {formatBountyAmount(bountyAmount)}
+              {" "}{formatBountyAmount(bountyAmount)}
             </span>
           </p>
         </div>

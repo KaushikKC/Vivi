@@ -42,7 +42,7 @@ const TextCard: React.FC<TextCardProps> = ({
   dislikes,
   commentCount,
   postId,
-  creatorAddress,
+  creatorAddress
 }) => {
   const [userData, setUserData] = useState<UserData>({ name: "Anonymous" });
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -66,55 +66,68 @@ const TextCard: React.FC<TextCardProps> = ({
       weekday: "long",
       day: "numeric",
       month: "long",
-      year: "numeric",
+      year: "numeric"
     });
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(
-          `https://vivi-backend.vercel.app/api/users/profile/${creatorAddress}`
-        );
-        const data = await response.json();
+  useEffect(
+    () => {
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(
+            `https://vivi-backend.vercel.app/api/users/profile/${creatorAddress}`
+          );
+          const data = await response.json();
 
-        if (data) {
-          setUserData({
-            name: data.name || "Anonymous",
-            profilePicture: data.profilePicture,
-          });
+          if (data) {
+            setUserData({
+              name: data.name || "Anonymous",
+              profilePicture: data.profilePicture
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setIsLoading(false);
+      };
+
+      if (creatorAddress) {
+        fetchUserData();
       }
-    };
+    },
+    [creatorAddress]
+  );
 
-    if (creatorAddress) {
-      fetchUserData();
-    }
-  }, [creatorAddress]);
-
-  useEffect(() => {
-    // Check if user has already liked/disliked
-    if (address) {
-      setIsLiked(likes.includes(address));
-      setIsDisliked(dislikes.includes(address));
-    }
-  }, [address, likes, dislikes]);
-
-  useEffect(() => {
-    if (address) {
-      const storedReaction = localStorage.getItem(`reaction-${_id}-${address}`);
-      if (storedReaction) {
-        const { isLiked: storedLiked, isDisliked: storedDisliked } =
-          JSON.parse(storedReaction);
-        setIsLiked(storedLiked);
-        setIsDisliked(storedDisliked);
+  useEffect(
+    () => {
+      // Check if user has already liked/disliked
+      if (address) {
+        setIsLiked(likes.includes(address));
+        setIsDisliked(dislikes.includes(address));
       }
-    }
-  }, [_id, address]);
+    },
+    [address, likes, dislikes]
+  );
+
+  useEffect(
+    () => {
+      if (address) {
+        const storedReaction = localStorage.getItem(
+          `reaction-${_id}-${address}`
+        );
+        if (storedReaction) {
+          const {
+            isLiked: storedLiked,
+            isDisliked: storedDisliked
+          } = JSON.parse(storedReaction);
+          setIsLiked(storedLiked);
+          setIsDisliked(storedDisliked);
+        }
+      }
+    },
+    [_id, address]
+  );
 
   const fetchCurrentReactions = async () => {
     try {
@@ -130,12 +143,15 @@ const TextCard: React.FC<TextCardProps> = ({
     }
   };
 
-  useEffect(() => {
-    fetchCurrentReactions();
-    const interval = setInterval(fetchCurrentReactions, 30000); // Update every 30 seconds
+  useEffect(
+    () => {
+      fetchCurrentReactions();
+      const interval = setInterval(fetchCurrentReactions, 30000); // Update every 30 seconds
 
-    return () => clearInterval(interval);
-  }, [_id]);
+      return () => clearInterval(interval);
+    },
+    [_id]
+  );
 
   const handleReaction = async (type: "like" | "dislike") => {
     if (!address) {
@@ -149,7 +165,7 @@ const TextCard: React.FC<TextCardProps> = ({
         address: contractAddress,
         abi: abi,
         functionName: type === "like" ? "likePost" : "dislikePost",
-        args: [BigInt(postId)],
+        args: [BigInt(postId)]
       });
 
       // Call backend API
@@ -158,12 +174,12 @@ const TextCard: React.FC<TextCardProps> = ({
         {
           type,
           isPost: true,
-          creatorAddress: address,
+          creatorAddress: address
         },
         {
           headers: {
-            Authorization: `Bearer ${address}`, // Assuming authMiddleware expects address in header
-          },
+            Authorization: `Bearer ${address}` // Assuming authMiddleware expects address in header
+          }
         }
       );
 
@@ -172,17 +188,17 @@ const TextCard: React.FC<TextCardProps> = ({
         setDislikesCount(response.data.dislikes);
 
         if (type === "like") {
-          setLikesCount((prev) => prev + (isLiked ? -1 : 1));
+          setLikesCount(prev => prev + (isLiked ? -1 : 1));
           setIsLiked(!isLiked);
           if (isDisliked) {
-            setDislikesCount((prev) => prev - 1);
+            setDislikesCount(prev => prev - 1);
             setIsDisliked(false);
           }
         } else {
-          setDislikesCount((prev) => prev + (isDisliked ? -1 : 1));
+          setDislikesCount(prev => prev + (isDisliked ? -1 : 1));
           setIsDisliked(!isDisliked);
           if (isLiked) {
-            setLikesCount((prev) => prev - 1);
+            setLikesCount(prev => prev - 1);
             setIsLiked(false);
           }
         }
@@ -193,7 +209,7 @@ const TextCard: React.FC<TextCardProps> = ({
           JSON.stringify({
             isLiked: type === "like" ? !isLiked : false,
             isDisliked: type === "dislike" ? !isDisliked : false,
-            timestamp: Date.now(),
+            timestamp: Date.now()
           })
         );
       }
@@ -207,70 +223,85 @@ const TextCard: React.FC<TextCardProps> = ({
   const handleDislike = () => handleReaction("dislike");
 
   return (
-    <section className="bg-gray-800 p-5 rounded-lg mb-4 max-w-3xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image
-            src={userData.profilePicture || avatar}
-            alt="User Avatar"
-            width={40}
-            height={40}
-            className="w-10 h-10 bg-gray-700 rounded-full object-cover"
-          />
-          <div>
-            <h3 className="text-[16px] font-semibold">
-              {isLoading ? "Loading..." : userData.name}
-            </h3>
-            <p className="text-sm text-gray-400">
-              Posted on {formatDate(timestamp)}
-            </p>
-          </div>
-        </div>
-        <Image src={close} alt="Close Icon" className="h-5 w-5" />
-      </div>
-      <div className="my-3">
-        {content.text && <p className="text-[17px]">{content.text}</p>}
-        {content.image && (
-          <Image
-            src={content.image}
-            alt="Post Content"
-            className="mt-3 w-full rounded-md"
-            width={500}
-            height={300}
-          />
-        )}
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={handleLike} className="flex items-center gap-1">
-            <FaThumbsUp
-              className={`h-5 w-5 ${
-                isLiked ? "text-blue-500" : "text-gray-400"
-              }`}
+    <Link href={`/details/${postId}`}>
+      <section
+        className="bg-gray-800 p-5 rounded-lg mb-4 max-w-3xl"
+        style={{
+          boxShadow: "2px 4px 6px rgba(163, 187, 212, 0.3)" /* Blue shadow */
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Image
+              src={userData.profilePicture || avatar}
+              alt="User Avatar"
+              width={40}
+              height={40}
+              className="w-10 h-10 bg-gray-700 rounded-full object-cover"
             />
-            <span className="text-white">{likesCount}</span>
-          </button>
-          <button onClick={handleDislike} className="flex items-center gap-1">
-            <FaThumbsDown
-              className={`h-5 w-5 ${
-                isDisliked ? "text-red-500" : "text-gray-400"
-              }`}
-            />
-            <span className="text-white">{dislikesCount}</span>
-          </button>
-          <div className="flex items-center gap-1">
-            <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
-            <span className="text-white">{commentCount}</span>
+            <div>
+              <h3 className="text-[16px] font-semibold">
+                {isLoading ? "Loading..." : userData.name}
+              </h3>
+              <p className="text-sm text-gray-400">
+                Posted on {formatDate(timestamp)}
+              </p>
+            </div>
           </div>
-          <IoMdShare className="h-5 w-5 text-gray-400" />
+          <Image src={close} alt="Close Icon" className="h-5 w-5" />
         </div>
-        <Link href={`/details/${postId}`}>
-          <button className="text-[16px] border border-[#7482F1] bg-transparent py-1 px-3 rounded-xl h-fit transition duration-200">
-            Know more
-          </button>
-        </Link>
-      </div>
-    </section>
+        <div className="my-3">
+          {content.text &&
+            <p className="text-[17px]">
+              {content.text}
+            </p>}
+          {content.image &&
+            <Image
+              src={content.image}
+              alt="Post Content"
+              className="mt-3 w-full rounded-md"
+              width={500}
+              height={300}
+            />}
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button onClick={handleLike} className="flex items-center gap-1">
+              <FaThumbsUp
+                className={`h-5 w-5 ${isLiked
+                  ? "text-blue-500"
+                  : "text-gray-400"}`}
+              />
+              <span className="text-white">
+                {likesCount}
+              </span>
+            </button>
+            <button onClick={handleDislike} className="flex items-center gap-1">
+              <FaThumbsDown
+                className={`h-5 w-5 ${isDisliked
+                  ? "text-red-500"
+                  : "text-gray-400"}`}
+              />
+              <span className="text-white">
+                {dislikesCount}
+              </span>
+            </button>
+            <div className="flex items-center gap-1">
+              <BiSolidCommentDetail className="h-5 w-5 text-gray-400" />
+              <span className="text-white">
+                {commentCount}
+              </span>
+            </div>
+            <IoMdShare className="h-5 w-5 text-gray-400" />
+          </div>
+          <Link href={`/details/${postId}`}>
+            <button className="text-[16px] border border-[#7482F1] text-[#7482F1] bg-transparent py-1 px-3 rounded-xl h-fit shadow-sm hover:shadow-md transition-all duration-300 hover:bg-[#7482F1] hover:text-white">
+              Know more
+            </button>
+          </Link>
+        </div>
+      </section>
+    </Link>
   );
 };
 
