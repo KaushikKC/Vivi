@@ -56,7 +56,15 @@ const Bounty: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [postCount, setPostCount] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [loading, setLoading] = useState(true);
   const { address } = useAccount();
+
+  const Spinner: React.FC = () => (
+    <div className="flex justify-center items-center h-full">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+    </div>
+  );
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -74,6 +82,8 @@ const Bounty: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching user posts:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -133,73 +143,68 @@ const Bounty: React.FC = () => {
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {activeFilter === "pending" && (
-            <>
-              {pendingBountyPosts.length > 0 ? (
-                pendingBountyPosts.map((post) =>
-                  post.postType === "VOICE" ? (
-                    <PendingBountyAudioCard
-                      key={post._id}
-                      audioUrl={getAudioUrl(post)}
-                      timestamp={post.timestamp}
-                      postId={post.postId}
-                      bountyAmount={post.bountyAmount}
-                      responseCount={post.commentCount}
-                    />
-                  ) : (
-                    <PendingBountyTextCard
-                      key={post._id}
-                      content={post.content.text || ""}
-                      timestamp={post.timestamp}
-                      postId={post.postId}
-                      bountyAmount={post.bountyAmount}
-                      responseCount={post.commentCount}
-                    />
-                  )
+          {loading ? (
+            <Spinner />
+          ) : activeFilter === "pending" ? (
+            pendingBountyPosts.length > 0 ? (
+              pendingBountyPosts.map((post) =>
+                post.postType === "VOICE" ? (
+                  <PendingBountyAudioCard
+                    key={post._id}
+                    audioUrl={getAudioUrl(post)}
+                    timestamp={post.timestamp}
+                    postId={post.postId}
+                    bountyAmount={post.bountyAmount}
+                    responseCount={post.commentCount}
+                  />
+                ) : (
+                  <PendingBountyTextCard
+                    key={post._id}
+                    content={post.content.text || ""}
+                    timestamp={post.timestamp}
+                    postId={post.postId}
+                    bountyAmount={post.bountyAmount}
+                    responseCount={post.commentCount}
+                  />
                 )
+              )
+            ) : (
+              <div className="col-span-2 text-center py-8">
+                <p className="text-xl text-gray-300">
+                  No pending bounty posts available
+                </p>
+              </div>
+            )
+          ) : closedBountyPosts.length > 0 ? (
+            closedBountyPosts.map((post) =>
+              post.postType === "VOICE" ? (
+                <ClosedBountyAudioCard
+                  key={post._id}
+                  audioUrl={getAudioUrl(post)}
+                  timestamp={post.timestamp}
+                  postId={post.postId}
+                  bountyAmount={post.bountyAmount}
+                  responseCount={post.commentCount}
+                  rewardedAddress={post.bountyPaidTo}
+                />
               ) : (
-                <div className="col-span-2 text-center py-8">
-                  <p className="text-xl text-gray-300">
-                    No pending bounty posts available
-                  </p>
-                </div>
-              )}
-            </>
-          )}
-          {activeFilter === "closed" && (
-            <>
-              {closedBountyPosts.length > 0 ? (
-                closedBountyPosts.map((post) =>
-                  post.postType === "VOICE" ? (
-                    <ClosedBountyAudioCard
-                      key={post._id}
-                      audioUrl={getAudioUrl(post)}
-                      timestamp={post.timestamp}
-                      postId={post.postId}
-                      bountyAmount={post.bountyAmount}
-                      responseCount={post.commentCount}
-                      rewardedAddress={post.bountyPaidTo}
-                    />
-                  ) : (
-                    <ClosedBountyTextCard
-                      key={post._id}
-                      content={post.content.text || ""}
-                      timestamp={post.timestamp}
-                      postId={post.postId}
-                      bountyAmount={post.bountyAmount}
-                      responseCount={post.commentCount}
-                      rewardedAddress={post.bountyPaidTo}
-                    />
-                  )
-                )
-              ) : (
-                <div className="col-span-2 text-center py-8">
-                  <p className="text-xl text-gray-300">
-                    No closed bounty posts available
-                  </p>
-                </div>
-              )}
-            </>
+                <ClosedBountyTextCard
+                  key={post._id}
+                  content={post.content.text || ""}
+                  timestamp={post.timestamp}
+                  postId={post.postId}
+                  bountyAmount={post.bountyAmount}
+                  responseCount={post.commentCount}
+                  rewardedAddress={post.bountyPaidTo}
+                />
+              )
+            )
+          ) : (
+            <div className="col-span-2 text-center py-8">
+              <p className="text-xl text-gray-300">
+                No closed bounty posts available
+              </p>
+            </div>
           )}
         </div>
       </main>

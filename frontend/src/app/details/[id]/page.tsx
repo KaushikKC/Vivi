@@ -125,6 +125,12 @@ function Details() {
 
   const { writeContract } = useWriteContract();
 
+  const Spinner: React.FC = () => (
+    <div className="flex justify-center items-center h-full mt-5">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+    </div>
+  );
+
   // Memoized fetch functions
   const fetchPostDetails = useCallback(async () => {
     try {
@@ -581,75 +587,79 @@ function Details() {
 </section>
         {/* Replace the existing comment cards with this */}
         <div className="space-y-4">
-          {comments?.map((comment) => {
-            if (comment.commentType === "TEXT") {
-              return (
-                <CommentTextCard
-                  key={comment._id}
-                  comment={{
-                    _id: comment._id,
-                    content:
-                      typeof comment.content === "object" &&
-                      comment.content?.text
-                        ? comment.content.text
-                        : (comment.content as string) || "",
-                    creatorAddress: comment.creatorAddress,
-                    isAnonymous: comment.isAnonymous,
-                    createdAt: comment.createdAt,
-                    likes: comment.likes || 0,
-                    dislikes: comment.dislikes || 0,
-                  }}
-                />
-              );
-            } else if (comment.commentType === "VOICE") {
-              let audioUrl;
-              try {
-                if (comment.content?.voice?.data) {
-                  // Check if the data is already a string or needs conversion
-                  const base64String =
-                    typeof comment.content.voice.data === "object"
-                      ? Buffer.from(comment.content.voice.data).toString(
-                          "base64"
-                        )
-                      : comment.content.voice.data;
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            comments?.map((comment) => {
+              if (comment.commentType === "TEXT") {
+                return (
+                  <CommentTextCard
+                    key={comment._id}
+                    comment={{
+                      _id: comment._id,
+                      content:
+                        typeof comment.content === "object" &&
+                        comment.content?.text
+                          ? comment.content.text
+                          : (comment.content as string) || "",
+                      creatorAddress: comment.creatorAddress,
+                      isAnonymous: comment.isAnonymous,
+                      createdAt: comment.createdAt,
+                      likes: comment.likes || 0,
+                      dislikes: comment.dislikes || 0,
+                    }}
+                  />
+                );
+              } else if (comment.commentType === "VOICE") {
+                let audioUrl;
+                try {
+                  if (comment.content?.voice?.data) {
+                    // Check if the data is already a string or needs conversion
+                    const base64String =
+                      typeof comment.content.voice.data === "object"
+                        ? Buffer.from(comment.content.voice.data).toString(
+                            "base64"
+                          )
+                        : comment.content.voice.data;
 
-                  // Create blob from base64
-                  const byteCharacters = Buffer.from(
-                    base64String,
-                    "base64"
-                  ).toString("binary");
-                  const byteNumbers = new Array(byteCharacters.length);
+                    // Create blob from base64
+                    const byteCharacters = Buffer.from(
+                      base64String,
+                      "base64"
+                    ).toString("binary");
+                    const byteNumbers = new Array(byteCharacters.length);
 
-                  for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                      byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: "audio/wav" });
+                    audioUrl = URL.createObjectURL(blob);
                   }
-
-                  const byteArray = new Uint8Array(byteNumbers);
-                  const blob = new Blob([byteArray], { type: "audio/wav" });
-                  audioUrl = URL.createObjectURL(blob);
+                } catch (error) {
+                  console.error("Error converting audio data:", error);
+                  audioUrl = comment.contentHash;
                 }
-              } catch (error) {
-                console.error("Error converting audio data:", error);
-                audioUrl = comment.contentHash;
-              }
 
-              return (
-                <CommentAudioCard
-                  key={comment._id}
-                  comment={{
-                    _id: comment._id,
-                    audioUrl: audioUrl || "",
-                    creatorAddress: comment.creatorAddress,
-                    isAnonymous: comment.isAnonymous,
-                    createdAt: comment.createdAt,
-                    likes: comment.likes || 0,
-                    dislikes: comment.dislikes || 0,
-                  }}
-                />
-              );
-            }
-            return null;
-          })}
+                return (
+                  <CommentAudioCard
+                    key={comment._id}
+                    comment={{
+                      _id: comment._id,
+                      audioUrl: audioUrl || "",
+                      creatorAddress: comment.creatorAddress,
+                      isAnonymous: comment.isAnonymous,
+                      createdAt: comment.createdAt,
+                      likes: comment.likes || 0,
+                      dislikes: comment.dislikes || 0,
+                    }}
+                  />
+                );
+              }
+              return null;
+            })
+          )}
         </div>
       </main>
     </div>

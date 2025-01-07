@@ -83,6 +83,12 @@ const Dashboard: React.FC = () => {
     return (Number(value.toString()) + 1).toString();
   };
 
+  const Spinner: React.FC = () => (
+    <div className="flex justify-center items-center h-full">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+    </div>
+  );
+
   const handleRecordClick = async () => {
     if (!isRecording) {
       try {
@@ -499,6 +505,7 @@ const Dashboard: React.FC = () => {
 
         {/* Posts */}
         <div className="space-y-4">
+<<<<<<< HEAD
           {posts?.map((post) => {
             if (post.postType === "TEXT") {
               return (
@@ -726,27 +733,262 @@ const Dashboard: React.FC = () => {
                   post.isAnonymous,
                 ]);
 
+=======
+          {loading ? (
+            <Spinner />
+          ) : (
+            posts?.map((post) => {
+              if (post.postType === "TEXT") {
+>>>>>>> b5bcf128cd269ad0934f580e2d4dc6b3420f136c
                 return (
-                  <AudioCard
+                  <TextCard
                     key={post._id}
                     _id={post._id}
-                    audioUrl={audioUrl}
+                    content={{
+                      text: post.content.text, // Handle both object and string content
+                      image: post.content.image || undefined,
+                    }}
                     creatorAddress={post.creatorAddress}
                     timestamp={post.timestamp}
                     likes={post.likes}
                     dislikes={post.dislikes}
                     commentCount={post.commentCount}
                     postId={post.postId}
-                    isProcessing={isProcessing}
                   />
                 );
-              };
+              } else if (post.postType === "VOICE") {
+                const AudioProcessor: React.FC = () => {
+                  const [audioUrl, setAudioUrl] = React.useState<string>(
+                    post.contentHash || ""
+                  );
+                  const [isProcessing, setIsProcessing] = React.useState(true);
+                  const audioContextRef = React.useRef<AudioContext | null>(
+                    null
+                  );
 
-              // Return the component with a key
-              return <AudioProcessor key={post._id} />;
-            }
-            return null;
-          })}
+                  React.useEffect(() => {
+                    const processAudio = async (
+                      byteArray: Uint8Array
+                    ): Promise<string> => {
+                      if (post.isAnonymous) {
+                        try {
+                          audioContextRef.current = new AudioContext();
+                          const audioContext = audioContextRef.current;
+
+                          // Create a new ArrayBuffer and copy the data
+                          const arrayBuffer = new ArrayBuffer(byteArray.length);
+                          const view = new Uint8Array(arrayBuffer);
+                          view.set(byteArray);
+
+                          const audioBuffer =
+                            await audioContext.decodeAudioData(arrayBuffer);
+
+                          // Rest of your audio processing code...
+                          const source = audioContext.createBufferSource();
+                          source.buffer = audioBuffer;
+
+                          // Noise gate to reduce background noise
+                          const noiseGate =
+                            audioContext.createDynamicsCompressor();
+                          noiseGate.threshold.value = -50;
+                          noiseGate.knee.value = 40;
+                          noiseGate.ratio.value = 12;
+                          noiseGate.attack.value = 0;
+                          noiseGate.release.value = 0.25;
+
+                          // High-pass filter to remove low frequency noise
+                          const highpass = audioContext.createBiquadFilter();
+                          highpass.type = "highpass";
+                          highpass.frequency.value = 80;
+                          highpass.Q.value = 0.7;
+
+                          // Bass boost
+                          const bassBoost = audioContext.createBiquadFilter();
+                          bassBoost.type = "lowshelf";
+                          bassBoost.frequency.value = 200;
+                          bassBoost.gain.value = 15;
+
+                          // Carriers for robotic effect
+                          const carrier1 = audioContext.createOscillator();
+                          carrier1.type = "square";
+                          carrier1.frequency.value = 30; // Lower frequency for deeper voice
+
+                          const carrier2 = audioContext.createOscillator();
+                          carrier2.type = "sawtooth";
+                          carrier2.frequency.value = 50; // Additional bass frequency
+
+                          // Modulation gains
+                          const modGain1 = audioContext.createGain();
+                          modGain1.gain.value = 0.3; // Reduced modulation for clarity
+
+                          const modGain2 = audioContext.createGain();
+                          modGain2.gain.value = 0.2;
+
+                          // Pitch shifting
+                          const pitchShift = audioContext.createBiquadFilter();
+                          pitchShift.type = "bandpass";
+                          pitchShift.frequency.value = 500; // Lower frequency for deeper voice
+                          pitchShift.Q.value = 8; // Reduced Q for smoother sound
+
+                          // Enhanced distortion
+                          const distortion = audioContext.createWaveShaper();
+                          distortion.curve = makeEnhancedDistortionCurve(200);
+
+                          // Main compressor for consistent volume
+                          const mainCompressor =
+                            audioContext.createDynamicsCompressor();
+                          mainCompressor.threshold.value = -24;
+                          mainCompressor.knee.value = 30;
+                          mainCompressor.ratio.value = 12;
+                          mainCompressor.attack.value = 0.003;
+                          mainCompressor.release.value = 0.25;
+
+                          // Final EQ stage
+                          const finalEQ = audioContext.createBiquadFilter();
+                          finalEQ.type = "peaking";
+                          finalEQ.frequency.value = 1000;
+                          finalEQ.Q.value = 1;
+                          finalEQ.gain.value = -6; // Reduce harsh frequencies
+
+                          // Final gain stage
+                          const mainGain = audioContext.createGain();
+                          mainGain.gain.value = 1.2;
+
+                          const destination =
+                            audioContext.createMediaStreamDestination();
+
+                          // Connect the processing chain
+                          source
+                            .connect(noiseGate)
+                            .connect(highpass)
+                            .connect(bassBoost)
+                            .connect(pitchShift)
+                            .connect(distortion)
+                            .connect(mainCompressor)
+                            .connect(finalEQ)
+                            .connect(mainGain);
+
+                          // Connect modulation
+                          carrier1.connect(modGain1);
+                          carrier2.connect(modGain2);
+                          modGain1.connect(mainGain.gain);
+                          modGain2.connect(mainGain.gain);
+
+                          mainGain.connect(destination);
+
+                          // Start oscillators
+                          carrier1.start();
+                          carrier2.start();
+
+                          return new Promise((resolve, reject) => {
+                            const mediaRecorder = new MediaRecorder(
+                              destination.stream,
+                              {
+                                mimeType: "audio/webm;codecs=opus",
+                                bitsPerSecond: 256000, // Increased bitrate for better quality
+                              }
+                            );
+                            const chunks: Blob[] = [];
+
+                            mediaRecorder.ondataavailable = (e: BlobEvent) =>
+                              chunks.push(e.data);
+
+                            mediaRecorder.onstop = () => {
+                              carrier1.stop();
+                              carrier2.stop();
+                              const modifiedBlob = new Blob(chunks, {
+                                type: "audio/webm",
+                              });
+                              resolve(URL.createObjectURL(modifiedBlob));
+                            };
+
+                            mediaRecorder.onerror = () =>
+                              reject(new Error("MediaRecorder error"));
+
+                            source.start(0);
+                            mediaRecorder.start();
+
+                            setTimeout(() => {
+                              mediaRecorder.stop();
+                              source.stop();
+                            }, audioBuffer.duration * 1000);
+                          });
+                        } catch (error) {
+                          console.error("Error processing audio", error);
+                          throw error;
+                        }
+                      } else {
+                        const blob = new Blob([byteArray], {
+                          type: "audio/wav",
+                        });
+                        return URL.createObjectURL(blob);
+                      }
+                    };
+
+                    const initializeAudio = async () => {
+                      setIsProcessing(true);
+                      try {
+                        if (post.content?.voice?.data) {
+                          const base64String =
+                            typeof post.content.voice.data === "object"
+                              ? Buffer.from(post.content.voice.data).toString(
+                                  "base64"
+                                )
+                              : post.content.voice.data;
+
+                          const byteArray = Uint8Array.from(
+                            atob(base64String),
+                            (c) => c.charCodeAt(0)
+                          );
+                          const url = await processAudio(byteArray);
+                          setAudioUrl(url);
+                        }
+                      } catch (error) {
+                        console.error("Error initializing audio:", error);
+                        setAudioUrl(post.contentHash || "");
+                      } finally {
+                        setIsProcessing(false);
+                      }
+                    };
+
+                    initializeAudio();
+
+                    return () => {
+                      if (audioUrl && audioUrl.startsWith("blob:")) {
+                        URL.revokeObjectURL(audioUrl);
+                      }
+                      if (audioContextRef.current) {
+                        audioContextRef.current.close();
+                      }
+                    };
+                  }, [
+                    post.content?.voice?.data,
+                    post.contentHash,
+                    post.isAnonymous,
+                  ]);
+
+                  return (
+                    <AudioCard
+                      key={post._id}
+                      _id={post._id}
+                      audioUrl={audioUrl}
+                      creatorAddress={post.creatorAddress}
+                      timestamp={post.timestamp}
+                      likes={post.likes}
+                      dislikes={post.dislikes}
+                      commentCount={post.commentCount}
+                      postId={post.postId}
+                      isProcessing={isProcessing}
+                    />
+                  );
+                };
+
+                // Return the component with a key
+                return <AudioProcessor key={post._id} />;
+              }
+              return null;
+            })
+          )}
         </div>
       </main>
     </div>
